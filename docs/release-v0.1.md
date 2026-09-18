@@ -13,6 +13,17 @@ All checks must be green on `main`:
 5. `npm run build`
 6. `npm run test:e2e`
 
+## Provider verification gate
+
+Provider adapter implementation and live provider verification are separate release facts.
+
+* OpenAI, Anthropic, and Gemini may ship as **Experimental** when their contract tests pass but a real API call has not been completed.
+* Qwen is the V0.1 live verification target. It remains **Experimental** until the production deployment completes a real BYOK smoke test.
+* A live Qwen smoke test must use a public or fictional fixture and must verify: HTTP success, structured output parsing, local validation, review correction, revalidation, and JSON/CSV/XLSX export.
+* API keys must never be committed to GitHub, stored in CI secrets for this smoke test, copied into project backups, or shared in screenshots.
+* Qwen region selection must be explicit. A failed request must never trigger an automatic retry in another region.
+* The selected provider region is provenance and must be retained with the extraction record.
+
 ## Repository gate
 
 Confirm these files are present and current:
