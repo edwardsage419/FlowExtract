@@ -1,10 +1,43 @@
 export type ProviderId = 'openai' | 'anthropic' | 'gemini' | 'qwen';
+export type QwenRegion = 'cn-beijing' | 'ap-southeast-1' | 'cn-hongkong';
+export type ProviderVerification = 'verified' | 'experimental';
+
+export interface ProviderMetadata {
+  label: string;
+  verification: ProviderVerification;
+}
+
+export const PROVIDER_METADATA: Record<ProviderId, ProviderMetadata> = {
+  openai: { label: 'OpenAI', verification: 'experimental' },
+  anthropic: { label: 'Anthropic', verification: 'experimental' },
+  gemini: { label: 'Gemini', verification: 'experimental' },
+  qwen: { label: 'Qwen (Alibaba Cloud)', verification: 'experimental' },
+};
+
+export const QWEN_REGIONS: Record<QwenRegion, { label: string; endpoint: string; dataLocation: string }> = {
+  'cn-beijing': {
+    label: 'China (Beijing)',
+    endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+    dataLocation: 'Chinese mainland',
+  },
+  'ap-southeast-1': {
+    label: 'Singapore',
+    endpoint: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions',
+    dataLocation: 'International',
+  },
+  'cn-hongkong': {
+    label: 'China (Hong Kong)',
+    endpoint: 'https://cn-hongkong.dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+    dataLocation: 'Hong Kong',
+  },
+};
 
 export interface ProviderExtractionInput {
   apiKey: string;
   model: string;
   documentText: string;
   jsonSchema: Record<string, unknown>;
+  region?: QwenRegion;
 }
 
 export interface ProviderExtractionResult {
