@@ -1,9 +1,16 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllTimers();
+  vi.useRealTimers();
+});
 
 describe('FlowExtract workspace', () => {
   it('renders the core Document, Schema, Extract, Review and Export workflow', () => {
+    vi.useFakeTimers();
     render(<App />);
     expect(screen.getByRole('heading', { name: /FlowExtract/i })).toBeInTheDocument();
     expect(screen.getByText(/1\. Document/i)).toBeInTheDocument();
