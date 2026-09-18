@@ -20,7 +20,7 @@ export function ExtractionPanel(props: ExtractionPanelProps) {
       <div className="provider-grid">
         <label className="field">Provider
           <select value={props.provider} onChange={(e) => props.onProviderChange(e.target.value as ProviderId)}>
-            <option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="gemini">Gemini</option>
+            <option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="gemini">Gemini</option><option value="qwen">Qwen (Alibaba Cloud)</option>
           </select>
         </label>
         <label className="field">Model<input value={props.model} onChange={(e) => props.onModelChange(e.target.value)} /></label>
