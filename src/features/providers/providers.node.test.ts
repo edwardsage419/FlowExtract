@@ -54,6 +54,27 @@ test('Gemini adapter sends JSON Schema and parses candidate text', async () => {
   assert.deepEqual(body.generationConfig.responseJsonSchema, jsonSchema);
 });
 
+test('Qwen adapter sends strict JSON Schema and parses OpenAI-compatible output', async () => {
+  let url = '';
+  let request: RequestInit | undefined;
+  const fetcher = async (nextUrl: string, init?: RequestInit) => {
+    url = nextUrl;
+    request = init;
+    return new Response(JSON.stringify({ choices: [{ message: { content: '{"amount":14}' } }] }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const result = await createProvider('qwen', fetcher).extract({ apiKey: 'qwen-key', model: 'qwen-test', documentText: 'Total 14', jsonSchema });
+  assert.deepEqual(result.data, { amount: 14 });
+  assert.match(url, /dashscope\.aliyuncs\.com\/compatible-mode\/v1\/chat\/completions$/);
+  const headers = new Headers(request?.headers);
+  assert.equal(headers.get('authorization'), 'Bearer qwen-key');
+  const body = JSON.parse(String(request?.body));
+  assert.equal(body.model, 'qwen-test');
+  assert.equal(body.response_format.type, 'json_schema');
+  assert.equal(body.response_format.json_schema.strict, true);
+  assert.deepEqual(body.response_format.json_schema.schema, jsonSchema);
+  assert.ok(!String(request?.body).includes('qwen-key'));
+});
+
 test('provider errors do not expose API keys', async () => {
   const fetcher = async () => new Response(JSON.stringify({ error: { message: 'bad request' } }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   await assert.rejects(
