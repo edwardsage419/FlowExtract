@@ -1,4 +1,4 @@
-import type { AIProvider, FetchLike, ProviderExtractionInput, ProviderExtractionResult, ProviderId } from './types.ts';
+import { QWEN_REGIONS, type AIProvider, type FetchLike, type ProviderExtractionInput, type ProviderExtractionResult, type ProviderId } from './types.ts';
 
 const SYSTEM_PROMPT = [
   'You extract structured data from business documents.',
@@ -125,7 +125,10 @@ class QwenProvider implements AIProvider {
   constructor(fetcher: FetchLike) { this.fetcher = fetcher; }
 
   async extract(input: ProviderExtractionInput): Promise<ProviderExtractionResult> {
-    const response = await this.fetcher('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+    const region = input.region ?? 'cn-beijing';
+    const endpoint = QWEN_REGIONS[region]?.endpoint;
+    if (!endpoint) throw new Error('Unsupported Qwen region.');
+    const response = await this.fetcher(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${input.apiKey}` },
       body: JSON.stringify({
