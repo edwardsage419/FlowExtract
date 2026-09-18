@@ -29,8 +29,5 @@ export async function toXlsx(fields: Record<string, ReviewedField>): Promise<Arr
   worksheet.addRow(keys);
   worksheet.addRow(keys.map((key) => fields[key].finalValue ?? ''));
   worksheet.getRow(1).font = { bold: true };
-  const buffer = await workbook.xlsx.writeBuffer();
-  return buffer instanceof ArrayBuffer
-    ? buffer
-    : buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer;
+  return workbook.xlsx.writeBuffer();
 }
