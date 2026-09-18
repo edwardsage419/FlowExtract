@@ -61,3 +61,28 @@ test('provider errors do not expose API keys', async () => {
     (error: Error) => !error.message.includes('super-secret') && /401/.test(error.message),
   );
 });
+
+
+test('default provider fetch keeps the browser fetch receiver valid', async () => {
+  const originalFetch = globalThis.fetch;
+  const expectedReceiver = globalThis;
+  globalThis.fetch = (async function (this: typeof globalThis, _input: string | URL | Request, _init?: RequestInit) {
+    assert.equal(this, expectedReceiver);
+    return new Response(JSON.stringify({ output: [{ content: [{ type: 'output_text', text: '{"amount":13}' }] }] }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }) as typeof fetch;
+
+  try {
+    const result = await createProvider('openai').extract({
+      apiKey: 'test-key',
+      model: 'gpt-test',
+      documentText: 'Total 13',
+      jsonSchema,
+    });
+    assert.deepEqual(result.data, { amount: 13 });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
