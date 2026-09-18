@@ -1,6 +1,6 @@
 # Changelog / 更新记录
 
-## Unreleased V0.1
+## V0.1.0 Release Candidate
 
 English:
 
@@ -13,7 +13,7 @@ English:
 * Added IndexedDB project storage and portable project backup and restore.
 * Added JSON, CSV, and XLSX export.
 * Added React review workspace and Cloudflare Pages deployment configuration.
-* Added unit, dependency free domain, persistence, component, and Playwright smoke tests.
+* Added dependency free domain, Vitest, persistence, component, TypeScript, production build, and Playwright smoke verification.
 
 中文：
 
@@ -26,10 +26,19 @@ English:
 * 建立 IndexedDB 项目存储与便携备份恢复。
 * 建立 JSON、CSV、XLSX 导出。
 * 建立 React Review 工作区和 Cloudflare Pages 部署配置。
-* 建立核心域、持久化、组件和 Playwright smoke 测试。
+* 建立无依赖核心域、Vitest、持久化、组件、TypeScript、生产构建和 Playwright smoke 验证。
 
-### Verification note / 验证说明
+### Verification / 验证
 
-The current execution environment cannot resolve `registry.npmjs.org`, so npm dependencies, Vitest, Playwright, TypeScript project build, and Vite production build have not yet been executed here. Dependency free Node 22 domain tests are executed separately. This limitation must be cleared before tagging V0.1.
+GitHub Actions now performs the full V0.1 release gate on Node.js 22:
 
-当前执行环境无法解析 `registry.npmjs.org`，因此这里暂时无法安装 npm 依赖，也无法执行 Vitest、Playwright、完整 TypeScript 项目构建和 Vite 生产构建。无依赖的 Node 22 核心域测试已经单独执行。正式打 V0.1 Tag 前必须清除这一验证缺口。
+1. Dependency free domain tests.
+2. Reproducible dependency install with `npm ci`.
+3. Vitest suite.
+4. TypeScript project typecheck.
+5. Vite production build.
+6. Playwright Chromium smoke test.
+
+The full gate passed on the public `main` branch during release preparation on September 18, 2026.
+
+GitHub Actions 现在使用 Node.js 22 执行完整 V0.1 发布门禁，包括核心域测试、`npm ci`、Vitest、TypeScript 类型检查、Vite 生产构建和 Playwright Chromium smoke。2026 年 9 月 18 日公开仓库 `main` 分支已通过完整流程。
