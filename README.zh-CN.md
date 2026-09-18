@@ -23,7 +23,7 @@ Review 是产品重点。AI 先给出预测，确定性 Validation Rules 检查�
 
 Schema 支持 `string`、`number`、`date`、`boolean`，并支持 Required、正则格式、数字最小值和最大值。
 
-BYOK Provider 已建立 OpenAI、Anthropic、Gemini 适配器。模型名称可以直接编辑，避免 Provider 更新模型后必须重新发布 FlowExtract。
+BYOK Provider 已建立 OpenAI、Anthropic、Gemini、Qwen（阿里云百炼 / Model Studio）适配器。模型名称可以直接编辑，避免 Provider 更新模型后必须重新发布 FlowExtract。Provider 的“代码已适配”和“真实 API 已验证”分开记录：即使 Contract Tests 已通过，在真实 API Smoke Test 成功前仍标记为 Experimental。
 
 导出支持 JSON、CSV、XLSX。项目数据保存在 IndexedDB，同时提供可移植 JSON 项目备份和恢复。
 
@@ -47,7 +47,7 @@ API Key 只保存在当前页面的 React 内存状态中，不写入 IndexedDB�
 src/features/
   documents/     文件检查、PDF.js 解析、本地 OCR
   schema/        字段定义和 JSON Schema
-  providers/     OpenAI、Anthropic、Gemini 适配器
+  providers/     OpenAI、Anthropic、Gemini、Qwen 适配器
   extraction/    与 Provider 无关的提取编排
   validation/    本地确定性验证
   review/        人工修改状态
@@ -97,7 +97,7 @@ Node version: 22
 
 UI 中的默认模型名称只是便利默认值，用户可以修改。
 
-OpenAI 使用 Responses API 的结构化 JSON 输出，并显式发送 `store: false`。Anthropic 使用 Messages API 和 structured output，并在浏览器适配器中加入其浏览器直连 Header。Gemini 使用 `generateContent` 和 `responseJsonSchema`。
+OpenAI 使用 Responses API 的结构化 JSON 输出，并显式发送 `store: false`。Anthropic 使用 Messages API 和 structured output，并在浏览器适配器中加入其浏览器直连 Header。Gemini 使用 `generateContent` 和 `responseJsonSchema`。Qwen 使用阿里云 Model Studio 的 OpenAI-compatible Chat Completions 和严格 JSON Schema 输出。Qwen Region 必须由用户明确选择；某个地域失败时，FlowExtract 不会把文档自动重试到其他地域。
 
 浏览器 BYOK 是 V0.1 在零后端约束下采用的明确取舍。API Key 不会嵌入应用，也会在刷新页面后清除，但输入期间页面运行时仍可以访问该 Key。OpenAI 和 Google 的官方安全说明都建议生产环境的长期 API Key 放在服务端。V0.1 测试应使用独立 Provider Key，并尽量限制权限、额度和消费上限。后续可增加由用户自己运行的本地 companion，或在 Provider 支持时采用短期授权。
 
