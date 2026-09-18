@@ -1,0 +1,9 @@
+{
+  "name": "Invoice fields",
+  "fields": [
+    { "name": "Customer Name", "key": "customer_name", "type": "string", "required": false },
+    { "name": "Invoice Number", "key": "invoice_number", "type": "string", "required": true },
+    { "name": "Date", "key": "date", "type": "date", "required": false },
+    { "name": "Amount", "key": "amount", "type": "number", "required": true, "rules": { "min": 0 } }
+  ]
+}
