@@ -133,7 +133,9 @@ class GeminiProvider implements AIProvider {
   }
 }
 
-export function createProvider(id: ProviderId, fetcher: FetchLike = fetch): AIProvider {
+const browserFetch: FetchLike = (url, init) => globalThis.fetch(url, init);
+
+export function createProvider(id: ProviderId, fetcher: FetchLike = browserFetch): AIProvider {
   if (id === 'openai') return new OpenAIProvider(fetcher);
   if (id === 'anthropic') return new AnthropicProvider(fetcher);
   return new GeminiProvider(fetcher);
