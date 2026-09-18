@@ -22,7 +22,7 @@ jobs:
           unzip -q -o /tmp/flowextract.zip -d /tmp/flowextract-source
           cp -a /tmp/flowextract-source/. .
           rm -rf .bootstrap
-          rm -f .github/workflows/bootstrap-source.yml
+          rm -f .github/workflows/ci.yml
       - name: Commit imported source
         shell: bash
         run: |
