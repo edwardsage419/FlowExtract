@@ -62,7 +62,7 @@ test('Qwen adapter sends strict JSON Schema and parses OpenAI-compatible output'
     request = init;
     return new Response(JSON.stringify({ choices: [{ message: { content: '{"amount":14}' } }] }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   };
-  const result = await createProvider('qwen', fetcher).extract({ apiKey: 'qwen-key', model: 'qwen-test', documentText: 'Total 14', jsonSchema });
+  const result = await createProvider('qwen', fetcher).extract({ apiKey: 'qwen-key', model: 'qwen-test', documentText: 'Total 14', jsonSchema, region: 'cn-beijing' });
   assert.deepEqual(result.data, { amount: 14 });
   assert.match(url, /dashscope\.aliyuncs\.com\/compatible-mode\/v1\/chat\/completions$/);
   const headers = new Headers(request?.headers);
@@ -73,6 +73,16 @@ test('Qwen adapter sends strict JSON Schema and parses OpenAI-compatible output'
   assert.equal(body.response_format.json_schema.strict, true);
   assert.deepEqual(body.response_format.json_schema.schema, jsonSchema);
   assert.ok(!String(request?.body).includes('qwen-key'));
+});
+
+test('Qwen region selection changes only the endpoint and never auto-falls back', async () => {
+  const urls: string[] = [];
+  const fetcher = async (url: string) => {
+    urls.push(url);
+    return new Response(JSON.stringify({ choices: [{ message: { content: '{"amount":15}' } }] }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  await createProvider('qwen', fetcher).extract({ apiKey: 'k', model: 'qwen-test', documentText: 'Total 15', jsonSchema, region: 'ap-southeast-1' });
+  assert.deepEqual(urls, ['https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions']);
 });
 
 test('provider errors do not expose API keys', async () => {
