@@ -1,4 +1,4 @@
-export type ProviderId = 'openai' | 'anthropic' | 'gemini';
+export type ProviderId = 'openai' | 'anthropic' | 'gemini' | 'qwen';
 
 export interface ProviderExtractionInput {
   apiKey: string;
@@ -23,4 +23,5 @@ export const DEFAULT_MODELS: Record<ProviderId, string> = {
   openai: 'gpt-5.6-luna',
   anthropic: 'claude-sonnet-5',
   gemini: 'gemini-3.8-flash',
+  qwen: 'qwen3.8-max',
 };
