@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test.skip(!process.env.PLAYWRIGHT_BASE_URL, 'Production smoke only runs against the configured live URL.');
 
 test('production supports manual AI Chat extraction and preserves API mode', async ({ page }) => {
+  test.setTimeout(180_000);
   const syntheticProject = {
     id: 'production-smoke-v011',
     name: 'Production smoke V0.1.1',
@@ -36,8 +37,16 @@ test('production supports manual AI Chat extraction and preserves API mode', asy
     },
   };
 
-  await page.goto('/');
-  await expect(page.getByText('v0.1.1')).toBeVisible();
+  let deployed = false;
+  for (let attempt = 1; attempt <= 12; attempt += 1) {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    if (await page.getByText('v0.1.1').isVisible().catch(() => false)) {
+      deployed = true;
+      break;
+    }
+    if (attempt < 12) await page.waitForTimeout(10_000);
+  }
+  expect(deployed, 'workers.dev did not serve the V0.1.1 build before the smoke-test deadline').toBe(true);
 
   await page.evaluate(async (project) => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -80,11 +89,14 @@ test('production supports manual AI Chat extraction and preserves API mode', asy
   }));
   await page.getByRole('button', { name: 'Import & validate' }).click();
 
-  await expect(page.getByDisplayValue('1333.8')).toBeVisible();
+  const amountCard = page.locator('.review-card').filter({ hasText: 'Amount' });
+  const amountInput = amountCard.getByLabel('Final value');
+  await expect(amountInput).toHaveValue('1333.8');
   await expect(page.getByText('0 issues')).toBeVisible();
 
-  await page.getByDisplayValue('1333.8').fill('1333.81');
-  await expect(page.getByText('corrected', { exact: true })).toBeVisible();
+  await amountInput.fill('1333.81');
+  await expect(amountInput).toHaveValue('1333.81');
+  await expect(amountCard.getByText('corrected', { exact: true })).toBeVisible();
 
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'JSON' }).click();
