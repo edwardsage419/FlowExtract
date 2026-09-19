@@ -69,8 +69,8 @@ test('production supports manual AI Chat extraction and preserves API mode', asy
   await expect(page.getByRole('button', { name: /AI Chat/i })).toHaveAttribute('aria-pressed', 'true');
 
   const prompt = page.getByLabel('Generated extraction prompt');
-  await expect(prompt).toContainText('INV-2026-0919');
-  await expect(prompt).toContainText('key=amount');
+  await expect(prompt).toHaveValue(/INV-2026-0919/);
+  await expect(prompt).toHaveValue(/key=amount/);
 
   await page.getByLabel('AI chat response').fill(JSON.stringify({
     customer_name: 'Redwood Demo Company',
