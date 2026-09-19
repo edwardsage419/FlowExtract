@@ -1,6 +1,6 @@
 # Manual AI Chat Extraction Mode
 
-Status: V0.1.1 production smoke verified on 2026-09-19; awaiting public tag and GitHub Release.
+Status: V0.1.1 production smoke verified. V0.1.2 Assisted AI Chat improvements are in development.
 
 ## Goal
 
@@ -16,11 +16,12 @@ The core FlowExtract pipeline remains:
 
 1. Parse the document locally.
 2. Build a prompt locally from the parsed document text and current schema.
-3. Let the user copy the prompt.
-4. Let the user open ChatGPT, Claude, Gemini, Qwen, or another AI chat.
-5. Let the user paste the AI response back into FlowExtract.
-6. Parse and validate the response locally.
-7. Continue through the existing Review, correction, export, persistence, and eval flow.
+3. Let the user explicitly click to copy the prompt and open ChatGPT, Claude, Gemini, Qwen, or another AI chat.
+4. The user pastes and sends the prompt in the AI chat.
+5. The user copies the AI response.
+6. Let the user explicitly click to read that response from the clipboard and validate it, or paste it manually if clipboard access is blocked.
+7. Parse and validate the response locally.
+8. Continue through the existing Review, correction, export, persistence, and eval flow.
 
 FlowExtract does not sign in to, automate, scrape, or read any AI chat account.
 
@@ -48,4 +49,4 @@ Malformed pasted output creates an extraction result with a global validation is
 
 The generated prompt contains parsed document text. Copying it does not transmit data. Once the user pastes it into an external AI service, that service's privacy, retention, billing, and account policies apply.
 
-No browser session reuse, cookie access, hidden API, web scraping, or cross-service automation is part of this mode.
+No browser session reuse, cookie access, hidden API, web scraping, AI-page DOM automation, or background clipboard monitoring is part of this mode. Clipboard read and write are user-triggered convenience actions only.
