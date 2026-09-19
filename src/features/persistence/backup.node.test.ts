@@ -48,3 +48,24 @@ test('backup import allows ordinary user field names containing secret as a subs
 
   assert.deepEqual(importProjectBackup(exportProjectBackup(withUserField)), withUserField);
 });
+
+
+test('backup round trips manual extraction provenance without provider credentials or raw chat response', () => {
+  const manualProject: ProjectRecord = {
+    ...project,
+    extraction: {
+      id: 'manual-e1',
+      documentId: 'd1',
+      schemaId: 's1',
+      extractionMode: 'manual',
+      manualService: 'chatgpt',
+      processedAt: '2026-09-19T00:00:00.000Z',
+      fields: {},
+      globalIssues: [],
+    },
+  };
+
+  const text = exportProjectBackup(manualProject);
+  assert.deepEqual(importProjectBackup(text), manualProject);
+  assert.doesNotMatch(text, /apiKey|Authorization|Bearer/i);
+});
