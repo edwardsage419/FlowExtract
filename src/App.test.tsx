@@ -51,10 +51,11 @@ describe('FlowExtract workspace', () => {
         name: 'invoice.pdf',
         mimeType: 'application/pdf',
         size: 100,
+        createdAt: '2026-09-19T00:00:00.000Z',
         text: 'Invoice total 1333.80',
-        pages: [{ page: 1, text: 'Invoice total 1333.80' }],
+        pages: ['Invoice total 1333.80'],
+        sourceKind: 'pdf',
         ocrUsed: false,
-        processedAt: '2026-09-19T00:00:00.000Z',
       },
       schema: {
         id: 'schema-1',
