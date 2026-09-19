@@ -1,6 +1,6 @@
 # Manual AI Chat Extraction Mode
 
-Status: V0.1.1 release candidate.
+Status: V0.1.1 production smoke verified on 2026-09-19; awaiting public tag and GitHub Release.
 
 ## Goal
 
