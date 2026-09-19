@@ -1,4 +1,4 @@
-import type { AIProvider, FetchLike, ProviderExtractionInput, ProviderExtractionResult, ProviderId } from './types.ts';
+import { QWEN_REGIONS, type AIProvider, type FetchLike, type ProviderExtractionInput, type ProviderExtractionResult, type ProviderId } from './types.ts';
 
 const SYSTEM_PROMPT = [
   'You extract structured data from business documents.',
@@ -50,6 +50,13 @@ function anthropicText(payload: unknown): string {
   const block = content.find((item) => item.type === 'text' && typeof item.text === 'string');
   if (!block?.text) throw new Error('Anthropic response did not contain output text.');
   return block.text;
+}
+
+function qwenText(payload: unknown): string {
+  const choices = (payload as { choices?: Array<{ message?: { content?: string } }> }).choices ?? [];
+  const text = choices[0]?.message?.content;
+  if (typeof text !== 'string' || !text.trim()) throw new Error('Qwen response did not contain output text.');
+  return text;
 }
 
 function geminiText(payload: unknown): string {
@@ -112,6 +119,36 @@ class AnthropicProvider implements AIProvider {
   }
 }
 
+class QwenProvider implements AIProvider {
+  readonly id = 'qwen' as const;
+  private readonly fetcher: FetchLike;
+  constructor(fetcher: FetchLike) { this.fetcher = fetcher; }
+
+  async extract(input: ProviderExtractionInput): Promise<ProviderExtractionResult> {
+    const region = input.region ?? 'cn-beijing';
+    const endpoint = QWEN_REGIONS[region]?.endpoint;
+    if (!endpoint) throw new Error('Unsupported Qwen region.');
+    const response = await this.fetcher(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${input.apiKey}` },
+      body: JSON.stringify({
+        model: input.model,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userPrompt(input.documentText) },
+        ],
+        response_format: {
+          type: 'json_schema',
+          json_schema: { name: 'flowextract_result', strict: true, schema: input.jsonSchema },
+        },
+      }),
+    });
+    const payload = await readResponse(response);
+    const rawText = qwenText(payload);
+    return { data: parseProviderJson(rawText), rawText };
+  }
+}
+
 class GeminiProvider implements AIProvider {
   readonly id = 'gemini' as const;
   private readonly fetcher: FetchLike;
@@ -138,5 +175,6 @@ const browserFetch: FetchLike = (url, init) => globalThis.fetch(url, init);
 export function createProvider(id: ProviderId, fetcher: FetchLike = browserFetch): AIProvider {
   if (id === 'openai') return new OpenAIProvider(fetcher);
   if (id === 'anthropic') return new AnthropicProvider(fetcher);
-  return new GeminiProvider(fetcher);
+  if (id === 'gemini') return new GeminiProvider(fetcher);
+  return new QwenProvider(fetcher);
 }

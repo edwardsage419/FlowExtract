@@ -23,7 +23,7 @@ Supported input targets:
 
 Schema fields support `string`, `number`, `date`, and `boolean`, plus required fields, regex patterns, and numeric minimum and maximum rules.
 
-BYOK provider adapters are included for OpenAI, Anthropic, and Gemini. Model names are editable because provider model lifecycles change independently from FlowExtract.
+BYOK provider adapters are included for OpenAI, Anthropic, Gemini, and Qwen (Alibaba Cloud Model Studio). Model names are editable because provider model lifecycles change independently from FlowExtract. Provider availability is tracked separately from adapter implementation: until a real API smoke test passes, a provider remains marked Experimental even when its contract tests pass.
 
 Exports include JSON, CSV, and XLSX. Project state is stored in IndexedDB. Portable JSON backup and restore are included.
 
@@ -47,7 +47,7 @@ The application is a static React and TypeScript SPA built with Vite.
 src/features/
   documents/     file acceptance, PDF.js parsing, local OCR
   schema/        field definitions and JSON Schema generation
-  providers/     OpenAI, Anthropic, Gemini adapters
+  providers/     OpenAI, Anthropic, Gemini, Qwen adapters
   extraction/    provider independent extraction orchestration
   validation/    deterministic local validation
   review/        human correction state
@@ -97,7 +97,7 @@ A free `pages.dev` subdomain is enough for the first public MVP. Do not add a pa
 
 Default model strings are convenience values only and are editable in the UI.
 
-OpenAI uses the Responses API with structured JSON output and requests `store: false`. Anthropic uses the Messages API and structured output. The browser adapter includes Anthropic's direct browser access header. Gemini uses `generateContent` with `responseJsonSchema`.
+OpenAI uses the Responses API with structured JSON output and requests `store: false`. Anthropic uses the Messages API and structured output. The browser adapter includes Anthropic's direct browser access header. Gemini uses `generateContent` with `responseJsonSchema`. Qwen uses Alibaba Cloud Model Studio's OpenAI-compatible Chat Completions interface with strict JSON Schema output. Qwen region selection is explicit; FlowExtract does not automatically retry a document in another region.
 
 Browser BYOK is a deliberate V0.1 tradeoff for a zero backend, user controlled tool. The key is never embedded in the application and is cleared on reload, but it is still accessible to the page runtime while entered. OpenAI and Google both recommend keeping long lived production API keys on a server. For V0.1 testing, use a dedicated provider key with the smallest practical permissions, quota, and spend limits. A future hardened option can use a user run local companion or provider specific short lived authorization when available.
 

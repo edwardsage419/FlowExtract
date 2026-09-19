@@ -1,6 +1,6 @@
 import type { DocumentRecord } from '../documents/types.ts';
 import type { ExtractionRecord } from '../project/types.ts';
-import type { AIProvider } from '../providers/types.ts';
+import type { AIProvider, QwenRegion } from '../providers/types.ts';
 import { schemaToJsonSchema, validateSchemaDefinition } from '../schema/schema.ts';
 import type { SchemaDefinition } from '../schema/types.ts';
 import { validateExtraction } from '../validation/validate.ts';
@@ -11,6 +11,7 @@ export interface RunExtractionInput {
   provider: AIProvider;
   apiKey: string;
   model: string;
+  providerRegion?: QwenRegion;
 }
 
 export async function runExtraction(input: RunExtractionInput): Promise<ExtractionRecord> {
@@ -27,6 +28,7 @@ export async function runExtraction(input: RunExtractionInput): Promise<Extracti
     model: input.model,
     documentText: input.document.text,
     jsonSchema: schemaToJsonSchema(input.schema),
+    region: input.providerRegion,
   });
   const validation = validateExtraction(input.schema, result.data);
 
@@ -36,6 +38,7 @@ export async function runExtraction(input: RunExtractionInput): Promise<Extracti
     schemaId: input.schema.id,
     provider: input.provider.id,
     model: input.model,
+    providerRegion: input.providerRegion,
     processedAt: new Date().toISOString(),
     rawResponse: result.rawText,
     fields: validation.fields,

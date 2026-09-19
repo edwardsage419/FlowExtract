@@ -11,7 +11,7 @@ import { exportProjectBackup, importProjectBackup } from './features/persistence
 import { listProjects, loadProject, saveProject } from './features/persistence/projectStore';
 import type { ProjectRecord } from './features/project/types';
 import { createProvider } from './features/providers/providers';
-import { DEFAULT_MODELS, type ProviderId } from './features/providers/types';
+import { DEFAULT_MODELS, type ProviderId, type QwenRegion } from './features/providers/types';
 import { applyCorrection } from './features/review/review';
 import type { FieldDefinition } from './features/schema/types';
 import './styles.css';
@@ -42,6 +42,7 @@ export default function App() {
   const [provider, setProvider] = useState<ProviderId>('openai');
   const [model, setModel] = useState(DEFAULT_MODELS.openai);
   const [apiKey, setApiKey] = useState('');
+  const [qwenRegion, setQwenRegion] = useState<QwenRegion>('cn-beijing');
   const [ocrLanguage, setOcrLanguage] = useState('eng');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState<'document' | 'extract' | null>(null);
@@ -87,7 +88,7 @@ export default function App() {
     if (!project.document) return;
     setBusy('extract'); setError('');
     try {
-      const extraction = await runExtraction({ document: project.document, schema: project.schema, provider: createProvider(provider), apiKey, model });
+      const extraction = await runExtraction({ document: project.document, schema: project.schema, provider: createProvider(provider), apiKey, model, providerRegion: provider === 'qwen' ? qwenRegion : undefined });
       setProject((current) => touch({ ...current, extraction }));
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Extraction failed.'); }
     finally { setBusy(null); }
@@ -146,7 +147,7 @@ export default function App() {
         </div>
         <div className="workspace-column middle-column">
           <SchemaBuilder schema={project.schema} onNameChange={(name) => updateSchema((schema) => ({ ...schema, name }))} onAddField={() => updateSchema((schema) => ({ ...schema, fields: [...schema.fields, field('New Field', `field_${schema.fields.length + 1}`, 'string')] }))} onRemoveField={(id) => updateSchema((schema) => ({ ...schema, fields: schema.fields.filter((item) => item.id !== id) }))} onFieldChange={(id, patch) => updateSchema((schema) => ({ ...schema, fields: schema.fields.map((item) => item.id === id ? { ...item, ...patch } : item) }))} />
-          <ExtractionPanel provider={provider} model={model} apiKey={apiKey} busy={busy === 'extract'} disabled={!project.document || !apiKey.trim() || project.schema.fields.length === 0} onProviderChange={(next) => { setProvider(next); setModel(DEFAULT_MODELS[next]); }} onModelChange={setModel} onApiKeyChange={setApiKey} onExtract={handleExtract} />
+          <ExtractionPanel provider={provider} model={model} apiKey={apiKey} qwenRegion={qwenRegion} busy={busy === 'extract'} disabled={!project.document || !apiKey.trim() || project.schema.fields.length === 0} onProviderChange={(next) => { setProvider(next); setModel(DEFAULT_MODELS[next]); }} onModelChange={setModel} onApiKeyChange={setApiKey} onQwenRegionChange={setQwenRegion} onExtract={handleExtract} />
         </div>
         <div className="workspace-column right-column">
           <ReviewPanel extraction={project.extraction} schema={project.schema} metrics={metrics} onCorrect={correct} onExport={exportData} />
