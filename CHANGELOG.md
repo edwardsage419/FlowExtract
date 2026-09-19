@@ -1,5 +1,23 @@
 # Changelog / 更新记录
 
+## V0.1.2 — Unreleased
+
+English:
+
+* Added Assisted AI Chat: one click copies the generated extraction prompt and opens the selected AI chat page.
+* Added user-triggered clipboard import that immediately runs the existing parse, Validation, and Review flow.
+* Kept manual response paste as a fallback when clipboard permissions are unavailable or blocked.
+* Clipboard access occurs only after an explicit user action. FlowExtract does not monitor clipboard content in the background.
+* Added no AI-page DOM automation, cookie or session access, scraping, backend service, or new dependency.
+
+中文：
+
+* 增加 Assisted AI Chat：一次点击复制生成的 Extraction Prompt，并打开用户选择的 AI Chat 页面。
+* 增加用户主动触发的 Clipboard Import，读取后立即进入现有 Parse、Validation 和 Review 流程。
+* Clipboard 权限不可用或被阻止时，继续保留手工粘贴 Response 的兜底路径。
+* Clipboard 只在用户明确点击时读取或写入，FlowExtract 不会在后台监听剪贴板。
+* 不增加 AI 页面 DOM 自动化、Cookie 或 Session 读取、网页抓取、Backend 或新依赖。
+
 ## V0.1.1 — 2026-09-19
 
 English:

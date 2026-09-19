@@ -22,7 +22,7 @@ FlowExtract is an open source browser application for turning PDFs and document 
 
 FlowExtract supports two extraction paths that converge on the same Validation, Review, Final Value, Export, and local eval flow:
 
-* **AI Chat**: generate a document-specific prompt locally, copy it into ChatGPT, Claude, Gemini, Qwen, or another AI chat, then paste the JSON response back into FlowExtract. No API key is required. FlowExtract does not automate or read the user's AI chat session.
+* **AI Chat**: generate a document-specific prompt locally, use **Copy prompt & open** to launch the selected AI chat, then use **Paste from clipboard & validate** after copying the AI response. Manual paste remains available when clipboard permission is blocked. No API key is required. FlowExtract does not automate or read the user's AI chat session.
 * **API**: keep the existing automated BYOK flow using OpenAI, Anthropic, Gemini, or Qwen. Provider usage may consume API quota or incur provider charges.
 
 Manual AI Chat imports preserve the AI prediction and record the selected chat service as provenance. The raw pasted chat response remains page-local while editing and is not added to the project record.
@@ -48,7 +48,7 @@ Exports include JSON, CSV, and XLSX. Project state is stored in IndexedDB. Porta
 
 FlowExtract has no application backend in V0.1.
 
-Documents are parsed in the browser. OCR runs locally with Tesseract.js. In AI Chat mode, FlowExtract generates the prompt locally and the user decides when and where to paste it. In API mode, parsed document text is sent directly from the browser to the provider selected by the user. FlowExtract does not proxy either path through a FlowExtract server.
+Documents are parsed in the browser. OCR runs locally with Tesseract.js. In AI Chat mode, FlowExtract generates the prompt locally and uses browser clipboard access only after explicit user clicks to reduce copy and paste steps. It opens the selected AI chat page but does not control, scrape, or read that page. In API mode, parsed document text is sent directly from the browser to the provider selected by the user. FlowExtract does not proxy either path through a FlowExtract server.
 
 API keys are held only in React memory for the current page session. They are not written to IndexedDB, project backups, source code, or logs. Reloading the page clears the key.
 

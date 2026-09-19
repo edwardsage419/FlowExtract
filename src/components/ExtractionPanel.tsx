@@ -18,7 +18,7 @@ interface ExtractionPanelProps {
   onModeChange: (mode: ExtractionMode) => void;
   onManualServiceChange: (service: ManualAIService) => void;
   onManualResponseChange: (response: string) => void;
-  onManualImport: () => void;
+  onManualImport: (response?: string) => void;
   onProviderChange: (provider: ProviderId) => void;
   onModelChange: (model: string) => void;
   onApiKeyChange: (key: string) => void;
@@ -27,18 +27,51 @@ interface ExtractionPanelProps {
 }
 
 export function ExtractionPanel(props: ExtractionPanelProps) {
-  const [copyStatus, setCopyStatus] = useState('');
+  const [assistStatus, setAssistStatus] = useState('');
   const verification = getProviderVerification(props.provider, props.provider === 'qwen' ? props.qwenRegion : undefined);
   const region = props.provider === 'qwen' ? QWEN_REGIONS[props.qwenRegion] : null;
   const manualService = MANUAL_AI_SERVICES[props.manualService];
 
-  async function copyPrompt() {
+  async function copyPromptAndOpen() {
     if (!props.manualPrompt) return;
+
+    let writePromise: Promise<void> | undefined;
     try {
-      await navigator.clipboard.writeText(props.manualPrompt);
-      setCopyStatus('Prompt copied.');
+      writePromise = navigator.clipboard?.writeText(props.manualPrompt);
     } catch {
-      setCopyStatus('Copy failed. Select the prompt and copy it manually.');
+      writePromise = undefined;
+    }
+
+    if (manualService.url) {
+      window.open(manualService.url, '_blank', 'noopener,noreferrer');
+    }
+
+    try {
+      if (!writePromise) throw new Error('Clipboard write is unavailable.');
+      await writePromise;
+      setAssistStatus(manualService.url
+        ? `Prompt copied. Paste it into ${manualService.label} and send it.`
+        : 'Prompt copied.');
+    } catch {
+      setAssistStatus(manualService.url
+        ? `${manualService.label} opened, but clipboard copy was blocked. Copy the prompt manually.`
+        : 'Clipboard copy was blocked. Copy the prompt manually.');
+    }
+  }
+
+  async function pasteFromClipboardAndValidate() {
+    try {
+      if (!navigator.clipboard?.readText) throw new Error('Clipboard read is unavailable.');
+      const response = await navigator.clipboard.readText();
+      if (!response.trim()) {
+        setAssistStatus('Clipboard is empty. Copy the AI response first.');
+        return;
+      }
+      props.onManualResponseChange(response);
+      props.onManualImport(response);
+      setAssistStatus('Clipboard response imported. Review the validation results.');
+    } catch {
+      setAssistStatus('Clipboard read was blocked. Paste the AI response into the box manually.');
     }
   }
 
@@ -50,7 +83,7 @@ export function ExtractionPanel(props: ExtractionPanelProps) {
       <div className="extraction-mode-switch" role="group" aria-label="Extraction method">
         <button className={'mode-card' + (props.mode === 'manual' ? ' active' : '')} type="button" aria-pressed={props.mode === 'manual'} onClick={() => props.onModeChange('manual')}>
           <strong>AI Chat</strong>
-          <span>Manual copy and paste. No API key required.</span>
+          <span>Use your existing AI chat. No API key required.</span>
         </button>
         <button className={'mode-card' + (props.mode === 'api' ? ' active' : '')} type="button" aria-pressed={props.mode === 'api'} onClick={() => props.onModeChange('api')}>
           <strong>API</strong>
@@ -65,23 +98,35 @@ export function ExtractionPanel(props: ExtractionPanelProps) {
               {Object.entries(MANUAL_AI_SERVICES).map(([id, item]) => <option key={id} value={id}>{item.label}</option>)}
             </select>
           </label>
-          <p className="privacy-note">Use a free or existing AI chat plan where available. FlowExtract does not sign in to, automate, or read your AI chat account.</p>
-          <p className="security-note">The generated prompt contains parsed document text. When you paste it into an AI service, that content is handled under that service's privacy and data retention policies.</p>
+
+          <p className="privacy-note">Assisted AI Chat only uses clipboard actions that you start. FlowExtract does not sign in to, automate, scrape, or read your AI chat account.</p>
+          <p className="security-note">The generated prompt contains parsed document text. Once you paste it into an AI service, that service's privacy and data retention policies apply.</p>
 
           <label className="field">Generated extraction prompt
             <textarea className="prompt-box" aria-label="Generated extraction prompt" readOnly rows={8} value={props.manualPrompt} placeholder="Upload a document and keep a valid schema to generate the prompt." />
           </label>
+
+          <div className="assisted-steps" aria-label="Assisted AI Chat steps">
+            <span><strong>1.</strong> Copy the prompt and open your AI chat.</span>
+            <span><strong>2.</strong> Paste, send, then copy the AI response.</span>
+            <span><strong>3.</strong> Return here and import from the clipboard.</span>
+          </div>
+
           <div className="manual-actions">
-            <button className="button secondary" type="button" disabled={!props.manualPrompt} onClick={() => void copyPrompt()}>Copy prompt</button>
-            {manualService.url && <a className="button secondary button-link" href={manualService.url} target="_blank" rel="noreferrer">Open {manualService.label}</a>}
-            {copyStatus && <span className="status-line muted" role="status">{copyStatus}</span>}
+            <button className="button secondary" type="button" disabled={!props.manualPrompt} onClick={() => void copyPromptAndOpen()}>
+              {manualService.url ? `Copy prompt & open ${manualService.label}` : 'Copy prompt'}
+            </button>
           </div>
 
           <label className="field">AI chat response
-            <textarea className="response-box" aria-label="AI chat response" rows={8} value={props.manualResponse} onChange={(e) => props.onManualResponseChange(e.target.value)} placeholder="Paste the JSON response from your AI chat here." />
+            <textarea className="response-box" aria-label="AI chat response" rows={8} value={props.manualResponse} onChange={(e) => props.onManualResponseChange(e.target.value)} placeholder="The response appears here after clipboard import, or paste it manually." />
           </label>
-          <p className="privacy-note">The pasted raw response stays in page memory while you edit it. After import, FlowExtract persists the parsed prediction, validation result, and manual service provenance.</p>
-          <button className="button primary full" type="button" disabled={props.manualDisabled || !props.manualResponse.trim()} onClick={props.onManualImport}>Import & validate</button>
+          <p className="privacy-note">Clipboard content is read only when you click the import button. The raw response stays in page memory while editing and is not saved in the project record.</p>
+
+          <button className="button primary full" type="button" disabled={props.manualDisabled} onClick={() => void pasteFromClipboardAndValidate()}>Paste from clipboard & validate</button>
+          <button className="button secondary full" type="button" disabled={props.manualDisabled || !props.manualResponse.trim()} onClick={() => props.onManualImport()}>Import current response & validate</button>
+
+          {assistStatus && <p className="status-line muted" role="status">{assistStatus}</p>}
         </div>
       )}
 

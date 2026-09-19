@@ -58,6 +58,8 @@ input:focus, select:focus, textarea:focus { outline: 2px solid #c7d2fe; border-c
 .mode-card strong { font-size: 13px; }
 .mode-card span { color: #667085; font-size: 11px; line-height: 1.4; }
 .manual-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
+.assisted-steps { display: grid; gap: 5px; margin: 10px 0; padding: 10px; border: 1px solid #e2e7ee; border-radius: 9px; background: #fbfcfd; color: #667085; font-size: 11px; line-height: 1.45; }
+.assisted-steps strong { color: #344054; }
 .button-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .prompt-box, .response-box { width: 100%; resize: vertical; line-height: 1.45; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
 .prompt-box { background: #f8fafc; min-height: 150px; }

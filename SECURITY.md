@@ -20,9 +20,9 @@ Production code should avoid logging document text, provider responses that may 
 
 ## Manual AI Chat trust boundary / Manual AI Chat 信任边界
 
-AI Chat mode generates the extraction prompt entirely in the browser. FlowExtract does not open authenticated sessions, read cookies, automate third-party chat interfaces, or submit the prompt on the user's behalf. The user decides whether to copy the prompt and paste it into an external AI service. The generated prompt contains parsed document content, so the selected AI service's privacy and data-retention policies apply after the user pastes it there. The raw pasted chat response remains transient UI state; the project persists only parsed extraction data, validation, corrections, and manual service provenance.
+AI Chat mode generates the extraction prompt entirely in the browser. Assisted AI Chat may open the selected service in a new tab and use browser clipboard read or write only after an explicit user click. FlowExtract does not monitor the clipboard in the background, open authenticated sessions, read cookies, automate third-party chat interfaces, scrape AI output, or submit the prompt on the user's behalf. The user decides whether to paste the prompt into an external AI service and whether to copy the response. The generated prompt contains parsed document content, so the selected AI service's privacy and data-retention policies apply after the user pastes it there. The raw pasted or clipboard-imported chat response remains transient UI state; the project persists only parsed extraction data, validation, corrections, and manual service provenance.
 
-AI Chat 模式完全在浏览器中生成 Extraction Prompt。FlowExtract 不读取 Cookie、不接管登录 Session、不自动操作第三方聊天页面，也不代替用户发送 Prompt。用户自行决定是否复制 Prompt 并粘贴到外部 AI 服务。Prompt 包含解析后的文档内容，因此用户粘贴后应遵循对应 AI 服务的隐私和数据保留政策。原始粘贴 Chat Response 只作为临时 UI 状态存在，项目只持久化解析后的 Extraction 数据、Validation、Correction 和 Manual Service Provenance。
+AI Chat 模式完全在浏览器中生成 Extraction Prompt。Assisted AI Chat 可以在用户明确点击后打开所选 AI 服务的新标签页，并调用浏览器 Clipboard 读写；FlowExtract 不会后台监听剪贴板，不读取 Cookie、不接管登录 Session、不自动操作或抓取第三方聊天页面，也不代替用户发送 Prompt。用户自行决定是否把 Prompt 粘贴到外部 AI 服务，以及是否复制 AI Response。Prompt 包含解析后的文档内容，因此用户粘贴后应遵循对应 AI 服务的隐私和数据保留政策。原始手工粘贴或 Clipboard 导入的 Chat Response 只作为临时 UI 状态存在，项目只持久化解析后的 Extraction 数据、Validation、Correction 和 Manual Service Provenance。
 
 ## Browser BYOK threat model / 浏览器 BYOK 威胁模型
 

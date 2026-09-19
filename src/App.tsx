@@ -147,7 +147,7 @@ export default function App() {
     finally { setBusy(null); }
   }
 
-  function handleManualImport() {
+  function handleManualImport(response = manualResponse) {
     if (!project.document) return;
     setError('');
     try {
@@ -155,7 +155,7 @@ export default function App() {
         document: project.document,
         schema: project.schema,
         service: manualService,
-        rawResponse: manualResponse,
+        rawResponse: response,
       });
       setProject((current) => touch({ ...current, extraction }));
     } catch (cause) {
@@ -203,7 +203,7 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div><div className="brand-row"><span className="brand-mark">FX</span><h1>FlowExtract</h1><span className="version">v0.1.1</span></div><p>Local first AI assisted document extraction, validation and human review.</p></div>
+        <div><div className="brand-row"><span className="brand-mark">FX</span><h1>FlowExtract</h1><span className="version">v0.1.2</span></div><p>Local first AI assisted document extraction, validation and human review.</p></div>
         <div className="top-actions">
           <select aria-label="Recent projects" value={project.id} onChange={(e) => openRecent(e.target.value)}>
             <option value={project.id}>{project.name}</option>
@@ -256,7 +256,7 @@ export default function App() {
         </div>
       </div>
       <footer>
-        <span>Documents are parsed locally. AI Chat mode lets you copy the prompt yourself; API mode sends document text directly to the provider you choose with your own key.</span>
+        <span>Documents are parsed locally. AI Chat uses user-triggered clipboard assistance; API mode sends document text directly to the provider you choose with your own key.</span>
         <a href="https://github.com/edwardsage419/FlowExtract/issues/new/choose" target="_blank" rel="noreferrer">Feedback</a>
       </footer>
     </main>

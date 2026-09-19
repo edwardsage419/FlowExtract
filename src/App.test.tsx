@@ -9,6 +9,7 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.clearAllTimers();
   vi.useRealTimers();
+  Reflect.deleteProperty(navigator, 'clipboard');
 });
 
 describe('FlowExtract workspace', () => {
@@ -22,7 +23,7 @@ describe('FlowExtract workspace', () => {
     expect(screen.getByText(/2\. Schema/i)).toBeInTheDocument();
     expect(screen.getByText(/3\. AI Extraction/i)).toBeInTheDocument();
     expect(screen.getByText(/4\. Review/i)).toBeInTheDocument();
-    expect(screen.getByText('v0.1.1')).toBeInTheDocument();
+    expect(screen.getByText('v0.1.2')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /AI Chat/i })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('option', { name: 'ChatGPT' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /^API/i }));
@@ -67,11 +68,101 @@ describe('FlowExtract workspace', () => {
     fireEvent.change(screen.getByLabelText('AI chat response'), {
       target: { value: fence + 'json\n{"amount":1333.8}\n' + fence },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Import & validate' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Import current response & validate' }));
 
     await waitFor(() => expect(screen.getByDisplayValue('1333.8')).toBeInTheDocument());
     expect(screen.getByText('1333.8')).toBeInTheDocument();
     expect(screen.getByText(/0 issues/i)).toBeInTheDocument();
+  });
+
+
+  it('uses user-triggered clipboard assistance without reading an AI chat session', async () => {
+    const source: ProjectRecord = {
+      id: 'assisted-source',
+      name: 'Assisted invoice',
+      updatedAt: '2026-09-19T00:00:00.000Z',
+      document: {
+        id: 'doc-assisted',
+        name: 'invoice.pdf',
+        mimeType: 'application/pdf',
+        size: 100,
+        createdAt: '2026-09-19T00:00:00.000Z',
+        text: 'Invoice INV-99 total 42.50',
+        pages: ['Invoice INV-99 total 42.50'],
+        sourceKind: 'pdf',
+        ocrUsed: false,
+      },
+      schema: {
+        id: 'schema-assisted',
+        name: 'Invoice',
+        updatedAt: '2026-09-19T00:00:00.000Z',
+        fields: [{ id: 'amount-field', name: 'Amount', key: 'amount', type: 'number', required: true, description: '', rules: {} }],
+      },
+    };
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    const readText = vi.fn().mockResolvedValue('{"amount":42.5}');
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText, readText },
+    });
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    vi.spyOn(projectStore, 'listProjects').mockResolvedValue([source]);
+    vi.spyOn(projectStore, 'saveProject').mockResolvedValue();
+
+    render(<App />);
+    await waitFor(() => expect(screen.getByRole('textbox', { name: /Project/i })).toHaveValue('Assisted invoice'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copy prompt & open ChatGPT' }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('key=amount')));
+    expect(open).toHaveBeenCalledWith('https://chatgpt.com/', '_blank', 'noopener,noreferrer');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Paste from clipboard & validate' }));
+    await waitFor(() => expect(readText).toHaveBeenCalledTimes(1));
+    expect(screen.getByLabelText('AI chat response')).toHaveValue('{"amount":42.5}');
+    await waitFor(() => expect(screen.getByDisplayValue('42.5')).toBeInTheDocument());
+    expect(screen.getByText(/0 issues/i)).toBeInTheDocument();
+  });
+
+  it('keeps manual paste available when clipboard access is blocked', async () => {
+    const source: ProjectRecord = {
+      id: 'clipboard-fallback',
+      name: 'Clipboard fallback',
+      updatedAt: '2026-09-19T00:00:00.000Z',
+      document: {
+        id: 'doc-fallback',
+        name: 'invoice.pdf',
+        mimeType: 'application/pdf',
+        size: 100,
+        createdAt: '2026-09-19T00:00:00.000Z',
+        text: 'Amount 10',
+        pages: ['Amount 10'],
+        sourceKind: 'pdf',
+        ocrUsed: false,
+      },
+      schema: {
+        id: 'schema-fallback',
+        name: 'Invoice',
+        updatedAt: '2026-09-19T00:00:00.000Z',
+        fields: [{ id: 'amount-field', name: 'Amount', key: 'amount', type: 'number', required: true, description: '', rules: {} }],
+      },
+    };
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: vi.fn().mockRejectedValue(new Error('blocked')), readText: vi.fn().mockRejectedValue(new Error('blocked')) },
+    });
+    vi.spyOn(window, 'open').mockReturnValue(null);
+    vi.spyOn(projectStore, 'listProjects').mockResolvedValue([source]);
+    vi.spyOn(projectStore, 'saveProject').mockResolvedValue();
+
+    render(<App />);
+    await waitFor(() => expect(screen.getByRole('textbox', { name: /Project/i })).toHaveValue('Clipboard fallback'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Paste from clipboard & validate' }));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/Clipboard read was blocked/i));
+
+    fireEvent.change(screen.getByLabelText('AI chat response'), { target: { value: '{"amount":10}' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Import current response & validate' }));
+    await waitFor(() => expect(screen.getByDisplayValue('10')).toBeInTheDocument());
   });
 
   it('does not autosave a blank project before startup hydration completes', async () => {
