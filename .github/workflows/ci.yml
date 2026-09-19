@@ -35,3 +35,31 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+
+
+  production-smoke:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [verify, browser-smoke]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Run production smoke against workers.dev
+        env:
+          PLAYWRIGHT_BASE_URL: https://flowextract.edwardxie421.workers.dev
+        run: |
+          for attempt in $(seq 1 12); do
+            echo "Production smoke attempt $attempt/12"
+            if npx playwright test tests/e2e/production.spec.ts --project=chromium; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 12 ]; then
+              sleep 10
+            fi
+          done
+          exit 1
