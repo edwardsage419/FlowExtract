@@ -169,7 +169,10 @@ export default function App() {
           <ReviewPanel extraction={project.extraction} schema={project.schema} metrics={metrics} onCorrect={correct} onExport={exportData} />
         </div>
       </div>
-      <footer>Documents stay in this browser. AI extraction sends document text directly to the provider you choose with your own API key.</footer>
+      <footer>
+        <span>Documents stay in this browser. AI extraction sends document text directly to the provider you choose with your own API key.</span>
+        <a href="https://github.com/edwardsage419/FlowExtract/issues/new/choose" target="_blank" rel="noreferrer">Feedback</a>
+      </footer>
     </main>
   );
 }

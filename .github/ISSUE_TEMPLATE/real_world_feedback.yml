@@ -1,0 +1,127 @@
+name: Real-world test feedback
+description: Share results from using FlowExtract on an actual document workflow
+title: "[Feedback] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Real-world failures and corrections are especially useful for FlowExtract V0.1 testing.
+
+        Do not include API keys, credentials, access tokens, full provider responses, or sensitive document content. Use public, synthetic, or sanitized examples if a reproduction is needed.
+
+  - type: input
+    id: document
+    attributes:
+      label: What kind of document did you process?
+      placeholder: "Example: supplier invoice, purchase order, bank statement"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: document-type
+    attributes:
+      label: Input format
+      options:
+        - Digital PDF
+        - Scanned PDF
+        - PNG
+        - JPG or JPEG
+        - Mixed
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: fields
+    attributes:
+      label: What fields were you trying to extract?
+      placeholder: "Example: vendor, invoice number, date, total"
+    validations:
+      required: true
+
+  - type: input
+    id: field-count
+    attributes:
+      label: Approximate number of fields
+      placeholder: "Example: 8"
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: AI provider
+      options:
+        - Qwen China (Beijing)
+        - Qwen Singapore
+        - Qwen Hong Kong
+        - OpenAI
+        - Anthropic
+        - Gemini
+    validations:
+      required: true
+
+  - type: input
+    id: corrected
+    attributes:
+      label: How many fields required manual correction?
+      placeholder: "Example: 2 of 8"
+
+  - type: input
+    id: review-time
+    attributes:
+      label: Approximately how long did review take?
+      placeholder: "Example: 90 seconds"
+
+  - type: textarea
+    id: worked
+    attributes:
+      label: What worked well?
+      description: Focus on concrete workflow behavior.
+
+  - type: textarea
+    id: friction
+    attributes:
+      label: What was the biggest problem or slowest step?
+    validations:
+      required: true
+
+  - type: textarea
+    id: previous
+    attributes:
+      label: What was your previous workflow?
+      placeholder: "Example: manually copy values into Excel"
+
+  - type: dropdown
+    id: time-saved
+    attributes:
+      label: Did FlowExtract save time?
+      options:
+        - Yes
+        - About the same
+        - No
+        - Not sure yet
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reuse
+    attributes:
+      label: Would you use FlowExtract again for this workflow?
+      options:
+        - Yes
+        - Maybe
+        - No
+    validations:
+      required: true
+
+  - type: textarea
+    id: improvement
+    attributes:
+      label: What single improvement would make FlowExtract significantly more useful?
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public issue safety
+      options:
+        - label: I confirmed that this issue does not contain API keys, credentials, access tokens, full provider responses, or sensitive document content.
+          required: true
