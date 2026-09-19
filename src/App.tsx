@@ -203,7 +203,7 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div><div className="brand-row"><span className="brand-mark">FX</span><h1>FlowExtract</h1><span className="version">v0.1.0</span></div><p>Local first AI assisted document extraction, validation and human review.</p></div>
+        <div><div className="brand-row"><span className="brand-mark">FX</span><h1>FlowExtract</h1><span className="version">v0.1.1</span></div><p>Local first AI assisted document extraction, validation and human review.</p></div>
         <div className="top-actions">
           <select aria-label="Recent projects" value={project.id} onChange={(e) => openRecent(e.target.value)}>
             <option value={project.id}>{project.name}</option>
