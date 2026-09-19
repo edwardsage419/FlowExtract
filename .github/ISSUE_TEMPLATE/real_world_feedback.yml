@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Real-world failures and corrections are especially useful for FlowExtract V0.1 testing.
+        Real-world failures, corrections, and AI Chat vs API workflow differences are especially useful for FlowExtract V0.1.x testing.
 
         Do not include API keys, credentials, access tokens, full provider responses, or sensitive document content. Use public, synthetic, or sanitized examples if a reproduction is needed.
 
@@ -46,18 +46,43 @@ body:
       placeholder: "Example: 8"
 
   - type: dropdown
-    id: provider
+    id: extraction-mode
     attributes:
-      label: AI provider
+      label: Which extraction mode did you use?
       options:
+        - AI Chat
+        - API
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ai-service
+    attributes:
+      label: Which AI chat service or API provider did you use?
+      options:
+        - ChatGPT
+        - Claude
+        - Gemini Chat
+        - Qwen Chat
+        - Other AI Chat
+        - OpenAI API
+        - Anthropic API
+        - Gemini API
         - Qwen China (Beijing)
         - Qwen Singapore
         - Qwen Hong Kong
-        - OpenAI
-        - Anthropic
-        - Gemini
+        - Other API
     validations:
       required: true
+
+  - type: dropdown
+    id: clipboard
+    attributes:
+      label: If you used AI Chat, how did you return the AI response?
+      options:
+        - Paste from clipboard & validate
+        - Manual paste fallback
+        - Not applicable — API mode
 
   - type: input
     id: corrected
