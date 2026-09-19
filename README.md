@@ -4,6 +4,14 @@ Local first AI assisted document extraction, validation and human review.
 
 [简体中文](README.zh-CN.md)
 
+## Try V0.1.0 and send feedback
+
+Live app: https://flowextract.edwardxie421.workers.dev
+
+Testing FlowExtract with a real document? Please report bugs and real-world test feedback through [GitHub Issues](https://github.com/edwardsage419/FlowExtract/issues/new/choose).
+
+Do not include API keys, credentials, full provider responses, or sensitive document content in public issues. If a reproduction file is useful, use a public, synthetic, or sanitized example.
+
 FlowExtract is an open source browser application for turning PDFs and document images into structured, reviewable data. The first release is deliberately small: upload a document, define a schema, extract with your own AI provider key, validate results locally, correct questionable fields, and export JSON, CSV, or XLSX.
 
 ## V0.1 workflow
