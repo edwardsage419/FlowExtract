@@ -1,6 +1,6 @@
 # Manual AI Chat Extraction Mode
 
-Status: Unreleased development for the next V0.1.x iteration.
+Status: V0.1.1 release candidate.
 
 ## Goal
 
