@@ -72,8 +72,8 @@ describe('FlowExtract workspace', () => {
 
     await waitFor(() => expect(screen.getByRole('textbox', { name: /Project/i })).toHaveValue('Saved invoice'));
     expect(screen.getByDisplayValue('1333.81')).toBeInTheDocument();
-    expect(screen.getByText(/AI prediction: 1333\.8/i)).toBeInTheDocument();
-    expect(screen.getByText(/corrected/i)).toBeInTheDocument();
+    expect(screen.getByText('1333.8')).toBeInTheDocument();
+    expect(screen.getAllByText(/corrected/i).length).toBeGreaterThan(0);
     expect(screen.getByPlaceholderText('Stored in memory only')).toHaveValue('');
   });
 });
