@@ -12,7 +12,7 @@ FlowExtract is an open source browser application for turning PDFs and document 
 
 The review step is the product focus. AI makes the first prediction. Deterministic rules identify missing, malformed, or out of range values. The user sees the source alongside the predicted and final values and corrects only what needs attention.
 
-## Current V0.1 development scope
+## V0.1 scope
 
 Supported input targets:
 
@@ -23,7 +23,7 @@ Supported input targets:
 
 Schema fields support `string`, `number`, `date`, and `boolean`, plus required fields, regex patterns, and numeric minimum and maximum rules.
 
-BYOK provider adapters are included for OpenAI, Anthropic, Gemini, and Qwen (Alibaba Cloud Model Studio). Model names are editable because provider model lifecycles change independently from FlowExtract. Provider availability is tracked separately from adapter implementation: until a real API smoke test passes, a provider remains marked Experimental even when its contract tests pass.
+BYOK provider adapters are included for OpenAI, Anthropic, Gemini, and Qwen (Alibaba Cloud Model Studio). Model names are editable because provider model lifecycles change independently from FlowExtract. Qwen is live-verified for V0.1 against Alibaba Cloud Model Studio in China (Beijing). OpenAI, Anthropic, and Gemini remain Experimental: their adapters and contract tests are included, but a real API smoke test has not been completed for this release.
 
 Exports include JSON, CSV, and XLSX. Project state is stored in IndexedDB. Portable JSON backup and restore are included.
 
@@ -79,29 +79,31 @@ npm run test:e2e
 
 `npm run test:domain` runs dependency free Node 22 domain tests. It remains usable when package installation is unavailable.
 
-## Cloudflare Pages deployment
+## Cloudflare Workers deployment
 
-FlowExtract requires no runtime server.
-
-Use these Pages settings:
+FlowExtract requires no application backend. The public V0.1 deployment uses Cloudflare Workers + Static Assets with Git integration.
 
 ```text
+Production branch: main
 Build command: npm run build
-Build output directory: dist
+Deploy command: npx wrangler deploy
+Static assets: ./dist
 Node version: 22
 ```
 
-A free `pages.dev` subdomain is enough for the first public MVP. Do not add a paid domain, database, server, or FlowExtract funded AI account before product validation requires it.
+Production: `https://flowextract.edwardxie421.workers.dev`
+
+The repository `wrangler.jsonc` configures `./dist` as SPA static assets. V0.1 stays on the free `workers.dev` hostname and does not add a paid domain, database, server-side AI proxy, or FlowExtract-funded AI account.
 
 ## Provider notes
 
-Default model strings are convenience values only and are editable in the UI.
+Default model strings are convenience values only and are editable in the UI. The V0.1 defaults were rechecked against official provider documentation on 2026-09-19: `gpt-5.6-luna`, `claude-sonnet-5`, `gemini-3.8-flash`, and `qwen3.8-max`.
 
 OpenAI uses the Responses API with structured JSON output and requests `store: false`. Anthropic uses the Messages API and structured output. The browser adapter includes Anthropic's direct browser access header. Gemini uses `generateContent` with `responseJsonSchema`. Qwen uses Alibaba Cloud Model Studio's OpenAI-compatible Chat Completions interface with strict JSON Schema output. Qwen region selection is explicit; FlowExtract does not automatically retry a document in another region.
 
 Browser BYOK is a deliberate V0.1 tradeoff for a zero backend, user controlled tool. The key is never embedded in the application and is cleared on reload, but it is still accessible to the page runtime while entered. OpenAI and Google both recommend keeping long lived production API keys on a server. For V0.1 testing, use a dedicated provider key with the smallest practical permissions, quota, and spend limits. A future hardened option can use a user run local companion or provider specific short lived authorization when available.
 
-Provider APIs can change. Verify current provider documentation before a release.
+Provider APIs can change. Recheck current provider documentation before each release. A valid model ID does not imply that FlowExtract has completed a live API smoke test for that provider.
 
 ## Known V0.1 limitations
 
@@ -118,6 +120,8 @@ Provider APIs can change. Verify current provider documentation before a release
 * `CONTRIBUTING.md`
 * `SECURITY.md`
 * `CHANGELOG.md`
+* `docs/deployment-cloudflare-workers.md`
+* `docs/release-v0.1.md`
 
 ## License
 
