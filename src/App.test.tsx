@@ -24,6 +24,7 @@ describe('FlowExtract workspace', () => {
     expect(screen.getByText(/4\. Review/i)).toBeInTheDocument();
     expect(screen.getByText('v0.1.0')).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /Qwen \(Alibaba Cloud\) — Verified in Beijing/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Feedback' })).toHaveAttribute('href', 'https://github.com/edwardsage419/FlowExtract/issues/new/choose');
   });
 
 
