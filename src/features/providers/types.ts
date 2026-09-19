@@ -11,7 +11,7 @@ export const PROVIDER_METADATA: Record<ProviderId, ProviderMetadata> = {
   openai: { label: 'OpenAI', verification: 'experimental' },
   anthropic: { label: 'Anthropic', verification: 'experimental' },
   gemini: { label: 'Gemini', verification: 'experimental' },
-  qwen: { label: 'Qwen (Alibaba Cloud)', verification: 'experimental' },
+  qwen: { label: 'Qwen (Alibaba Cloud)', verification: 'verified' },
 };
 
 export const QWEN_REGIONS: Record<QwenRegion, { label: string; endpoint: string; dataLocation: string }> = {
