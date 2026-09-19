@@ -22,7 +22,7 @@ describe('FlowExtract workspace', () => {
     expect(screen.getByText(/2\. Schema/i)).toBeInTheDocument();
     expect(screen.getByText(/3\. AI Extraction/i)).toBeInTheDocument();
     expect(screen.getByText(/4\. Review/i)).toBeInTheDocument();
-    expect(screen.getByText('v0.1.0')).toBeInTheDocument();
+    expect(screen.getByText('v0.1.1')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /AI Chat/i })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('option', { name: 'ChatGPT' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /^API/i }));
