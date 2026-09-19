@@ -1,4 +1,4 @@
-import { PROVIDER_METADATA, QWEN_REGIONS, type ProviderId, type QwenRegion } from '../features/providers/types';
+import { getProviderVerification, PROVIDER_METADATA, QWEN_REGIONS, type ProviderId, type QwenRegion } from '../features/providers/types';
 
 interface ExtractionPanelProps {
   provider: ProviderId;
@@ -16,6 +16,7 @@ interface ExtractionPanelProps {
 
 export function ExtractionPanel(props: ExtractionPanelProps) {
   const metadata = PROVIDER_METADATA[props.provider];
+  const verification = getProviderVerification(props.provider, props.provider === 'qwen' ? props.qwenRegion : undefined);
   const region = props.provider === 'qwen' ? QWEN_REGIONS[props.qwenRegion] : null;
   return (
     <section className="panel extraction-panel">
@@ -25,7 +26,7 @@ export function ExtractionPanel(props: ExtractionPanelProps) {
         <label className="field">Provider
           <select value={props.provider} onChange={(e) => props.onProviderChange(e.target.value as ProviderId)}>
             {Object.entries(PROVIDER_METADATA).map(([id, item]) => (
-              <option key={id} value={id}>{item.label} — {item.verification === 'verified' ? 'Verified' : 'Experimental'}</option>
+              <option key={id} value={id}>{item.label} — {id === 'qwen' ? 'Verified in Beijing' : 'Experimental'}</option>
             ))}
           </select>
         </label>
@@ -41,7 +42,7 @@ export function ExtractionPanel(props: ExtractionPanelProps) {
           <p className="security-note">Document text will be sent only to the selected Qwen region ({region?.dataLocation}). FlowExtract never automatically falls back to another region.</p>
         </>
       )}
-      <p className="privacy-note">Provider status: {metadata.verification === 'verified' ? 'live verified' : 'experimental / contract-tested until a live smoke test passes'}.</p>
+      <p className="privacy-note">Provider status: {verification === 'verified' ? 'live verified for the selected region' : 'experimental / contract-tested until a live smoke test passes for the selected region'}.</p>
       <label className="field">API key<input type="password" autoComplete="off" spellCheck={false} value={props.apiKey} onChange={(e) => props.onApiKeyChange(e.target.value)} placeholder="Stored in memory only" /></label>
       <p className="privacy-note">The key is kept only in this page session. It is never saved to IndexedDB or project backups.</p>
       <p className="security-note">Browser BYOK exposes the entered key to this page runtime. For testing, use a dedicated provider key with a low quota or spend limit.</p>
