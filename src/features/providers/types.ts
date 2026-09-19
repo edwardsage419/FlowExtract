@@ -5,14 +5,21 @@ export type ProviderVerification = 'verified' | 'experimental';
 export interface ProviderMetadata {
   label: string;
   verification: ProviderVerification;
+  verifiedRegions?: QwenRegion[];
 }
 
 export const PROVIDER_METADATA: Record<ProviderId, ProviderMetadata> = {
   openai: { label: 'OpenAI', verification: 'experimental' },
   anthropic: { label: 'Anthropic', verification: 'experimental' },
   gemini: { label: 'Gemini', verification: 'experimental' },
-  qwen: { label: 'Qwen (Alibaba Cloud)', verification: 'experimental' },
+  qwen: { label: 'Qwen (Alibaba Cloud)', verification: 'experimental', verifiedRegions: ['cn-beijing'] },
 };
+
+export function getProviderVerification(id: ProviderId, region?: QwenRegion): ProviderVerification {
+  const metadata = PROVIDER_METADATA[id];
+  if (id === 'qwen' && region && metadata.verifiedRegions?.includes(region)) return 'verified';
+  return metadata.verification;
+}
 
 export const QWEN_REGIONS: Record<QwenRegion, { label: string; endpoint: string; dataLocation: string }> = {
   'cn-beijing': {

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createProvider, parseProviderJson } from './providers.ts';
+import { getProviderVerification } from './types.ts';
 
 const jsonSchema = { type: 'object', properties: { amount: { type: ['number', 'null'] } }, required: ['amount'], additionalProperties: false };
 
@@ -116,4 +117,11 @@ test('default provider fetch keeps the browser fetch receiver valid', async () =
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test('Qwen live verification is scoped to Beijing', () => {
+  assert.equal(getProviderVerification('qwen', 'cn-beijing'), 'verified');
+  assert.equal(getProviderVerification('qwen', 'ap-southeast-1'), 'experimental');
+  assert.equal(getProviderVerification('qwen', 'cn-hongkong'), 'experimental');
+  assert.equal(getProviderVerification('openai'), 'experimental');
 });

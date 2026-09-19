@@ -20,7 +20,7 @@ V0.1 excludes accounts, subscriptions, Stripe, cloud databases, cloud file stora
 ## 3. Fixed constraints
 
 1. Fixed operating cost must remain USD 0 per month before real users and revenue.
-2. The application must be deployable as static assets to Cloudflare Pages.
+2. The application must be deployable as static assets to Cloudflare Workers + Static Assets on the Free plan.
 3. User documents must not be uploaded to a FlowExtract controlled server.
 4. AI calls use BYOK and go directly from the browser to the provider selected by the user.
 5. API keys remain in volatile UI state only. They are not persisted, logged, exported, or committed.
@@ -36,7 +36,7 @@ Core modules:
 
 * `features/documents`: file acceptance, PDF text extraction, image OCR, document metadata.
 * `features/schema`: schema definitions, schema builder state, conversion to JSON Schema.
-* `features/providers`: provider interface plus OpenAI, Anthropic, and Gemini adapters.
+* `features/providers`: provider interface plus OpenAI, Anthropic, Gemini, and Qwen adapters, including explicit Qwen region routing.
 * `features/extraction`: provider independent extraction orchestration and response normalization.
 * `features/validation`: deterministic validation of AI output against field definitions and rules.
 * `features/review`: editable field review model and issue focused UI.
@@ -99,6 +99,7 @@ The UI composes these modules in one workspace. Business logic stays out of Reac
 * schemaId
 * provider
 * model
+* providerRegion optional
 * processedAt
 * rawResponse optional
 * fields
@@ -160,9 +161,11 @@ interface AIProvider {
 }
 ```
 
-`ProviderExtractionInput` includes API key, model, document text, and JSON Schema. Provider adapters own endpoint URLs, headers, request bodies, and provider response parsing.
+`ProviderExtractionInput` includes API key, model, document text, JSON Schema, and optional provider region metadata. Provider adapters own endpoint URLs, headers, request bodies, provider response parsing, and provider-specific region resolution.
 
-V0.1 includes browser adapters for OpenAI, Anthropic, and Gemini. Model identifiers are editable in the UI so provider model lifecycle changes do not require a FlowExtract release.
+V0.1 includes browser adapters for OpenAI, Anthropic, Gemini, and Qwen. Model identifiers are editable in the UI so provider model lifecycle changes do not require a FlowExtract release. Qwen region selection is explicit and must never automatically fall back across regions after a failed request.
+
+Provider implementation status is separate from live verification status. Qwen is Live Verified for V0.1 through a production China (Beijing) smoke test. OpenAI, Anthropic, and Gemini remain Experimental until their own live API smoke tests pass.
 
 Provider errors are normalized into safe messages. API keys and full document text are never logged.
 
@@ -172,7 +175,7 @@ The normalized provider result is a JSON object whose keys correspond to schema 
 
 Providers are prompted to return only the requested fields. The response passes through JSON parsing and structural validation before becoming an ExtractionRecord.
 
-V0.1 provenance stores provider, model, timestamp, document id, prediction, final value, validation issues, correction state, and optional source evidence returned by the provider. Exact bounding box provenance is deferred.
+V0.1 provenance stores provider, model, optional provider region, timestamp, document id, prediction, final value, validation issues, correction state, and optional source evidence returned by the provider. Exact bounding box provenance is deferred.
 
 ## 10. Validation
 
@@ -210,13 +213,13 @@ Exports use final reviewed values.
 
 * JSON: object plus optional provenance envelope.
 * CSV: one row, headers from schema keys, RFC style escaping.
-* XLSX: one worksheet using SheetJS.
+* XLSX: one worksheet using ExcelJS.
 
 The export module is independent from UI code and covered by tests.
 
 ## 13. Local persistence and backup
 
-IndexedDB stores project records under a versioned database. Autosave occurs after meaningful project changes with debounce in the UI.
+IndexedDB stores project records under a versioned database. Autosave occurs after meaningful project changes with debounce in the UI. On startup, FlowExtract restores the most recently updated local project after IndexedDB hydration completes; autosave must not run before that initial hydration finishes.
 
 Backup exports a portable JSON file containing version, project metadata, parsed document text, schema, extraction, and validation state. Restore validates the backup format before writing it locally.
 
@@ -260,9 +263,9 @@ Priority automated tests:
 
 ## 17. Deployment
 
-`npm run build` generates static assets in `dist/`. Cloudflare Pages can deploy with build command `npm run build` and output directory `dist`.
+`npm run build` generates static assets in `dist/`. V0.1 production uses Cloudflare Workers + Static Assets with `wrangler.jsonc` pointing to `./dist` and SPA fallback enabled. Cloudflare Workers Builds connects to GitHub and deploys verified `main` commits to the free `workers.dev` hostname.
 
-No runtime server, database, paid domain, or paid SaaS is required.
+No FlowExtract runtime backend, database, paid domain, or paid SaaS is required.
 
 ## 18. V0.1 release gate
 
