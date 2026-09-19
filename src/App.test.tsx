@@ -70,7 +70,7 @@ describe('FlowExtract workspace', () => {
     vi.spyOn(projectStore, 'saveProject').mockResolvedValue();
     render(<App />);
 
-    await waitFor(() => expect(screen.getByDisplayValue('Saved invoice')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('textbox', { name: /Project/i })).toHaveValue('Saved invoice'));
     expect(screen.getByDisplayValue('1333.81')).toBeInTheDocument();
     expect(screen.getByText(/AI prediction: 1333\.8/i)).toBeInTheDocument();
     expect(screen.getByText(/corrected/i)).toBeInTheDocument();
