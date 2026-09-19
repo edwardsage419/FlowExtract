@@ -117,3 +117,10 @@ test('default provider fetch keeps the browser fetch receiver valid', async () =
     globalThis.fetch = originalFetch;
   }
 });
+
+test('Qwen live verification is scoped to Beijing', () => {
+  assert.equal(getProviderVerification('qwen', 'cn-beijing'), 'verified');
+  assert.equal(getProviderVerification('qwen', 'ap-southeast-1'), 'experimental');
+  assert.equal(getProviderVerification('qwen', 'cn-hongkong'), 'experimental');
+  assert.equal(getProviderVerification('openai'), 'experimental');
+});
