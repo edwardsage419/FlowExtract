@@ -4,7 +4,7 @@ Local First 的 AI 辅助文档数据提取、验证与人工复核工具。
 
 [English](README.md)
 
-## 试用 V0.1.0 与反馈
+## 试用 FlowExtract 与反馈
 
 在线版本：https://flowextract.edwardxie421.workers.dev
 
@@ -12,7 +12,7 @@ Local First 的 AI 辅助文档数据提取、验证与人工复核工具。
 
 请勿在公开 Issue 中提交 API Key、凭据、完整 Provider Response 或敏感文档正文。如需提供复现文件，请使用公开、虚构或已脱敏的示例。
 
-FlowExtract 是一个开源浏览器应用，用于把 PDF 和文档图片转换成可以人工复核的结构化数据。V0.1 刻意控制范围：上传文档，定义 Schema，使用自己的 AI Provider API Key 完成初始提取，在本地执行确定性验证，只修正可疑字段，然后导出 JSON、CSV 或 XLSX。
+FlowExtract 是一个开源浏览器应用，用于把 PDF 和文档图片转换成可以人工复核的结构化数据。当前 V0.1.x 继续控制范围：上传文档，定义 Schema，通过 AI Chat 或自己的 AI Provider API Key 完成初始提取，在本地执行确定性验证，只修正可疑字段，然后导出 JSON、CSV 或 XLSX。
 
 ## V0.1 工作流
 
