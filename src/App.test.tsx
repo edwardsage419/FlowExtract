@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import * as projectStore from './features/persistence/projectStore';
@@ -22,6 +22,23 @@ describe('FlowExtract workspace', () => {
     expect(screen.getByText(/2\. Schema/i)).toBeInTheDocument();
     expect(screen.getByText(/3\. AI Extraction/i)).toBeInTheDocument();
     expect(screen.getByText(/4\. Review/i)).toBeInTheDocument();
+  });
+
+
+  it('does not autosave a blank project before startup hydration completes', async () => {
+    vi.useFakeTimers();
+    let resolveProjects!: (projects: ProjectRecord[]) => void;
+    const pendingProjects = new Promise<ProjectRecord[]>((resolve) => { resolveProjects = resolve; });
+    vi.spyOn(projectStore, 'listProjects').mockReturnValue(pendingProjects);
+    const save = vi.spyOn(projectStore, 'saveProject').mockResolvedValue();
+    render(<App />);
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(500); });
+    expect(save).not.toHaveBeenCalled();
+
+    await act(async () => { resolveProjects([]); await pendingProjects; });
+    await act(async () => { await vi.advanceTimersByTimeAsync(400); });
+    expect(save).toHaveBeenCalledTimes(1);
   });
 
   it('restores the latest local project including corrections without restoring an API key', async () => {
