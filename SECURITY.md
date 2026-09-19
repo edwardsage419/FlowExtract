@@ -8,9 +8,9 @@ Do not open a public issue containing API keys, private documents, credentials, 
 
 ## V0.1 trust boundary / V0.1 信任边界
 
-FlowExtract has no application backend. Documents are parsed locally. Parsed text is sent directly to the user's selected AI provider only when the user starts extraction. API keys remain in volatile browser state and must never enter IndexedDB, backups, logs, fixtures, screenshots, or repository files.
+FlowExtract has no application backend. Documents are parsed locally. Parsed text is sent directly to the user's selected AI provider only when the user starts extraction. For Qwen, the user explicitly selects the provider region and FlowExtract never automatically retries the same document in another region after failure. API keys remain in volatile browser state and must never enter IndexedDB, backups, logs, fixtures, screenshots, or repository files.
 
-FlowExtract 没有应用后端。文档在本地解析。只有用户主动执行提取时，解析后的文本才会直接发送给用户选择的 AI Provider。API Key 只能存在于浏览器临时状态，禁止进入 IndexedDB、备份、日志、测试 fixtures、截图和仓库文件。
+FlowExtract 没有应用后端。文档在本地解析。只有用户主动执行提取时，解析后的文本才会直接发送给用户选择的 AI Provider。Qwen 地域由用户明确选择，FlowExtract 不会在请求失败后自动把同一文档重试到其他地域。API Key 只能存在于浏览器临时状态，禁止进入 IndexedDB、备份、日志、测试 fixtures、截图和仓库文件。
 
 ## Logging / 日志
 
