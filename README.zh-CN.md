@@ -139,3 +139,5 @@ MIT
 
 * `docs/deployment-cloudflare-workers.md`
 * `docs/release-v0.1.md`
+* `docs/release-v0.1.1.md`
+* `docs/manual-ai-chat-mode.md`
