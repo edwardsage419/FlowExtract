@@ -9,6 +9,8 @@ test('shows the complete FlowExtract workflow shell', async ({ page }) => {
   await expect(page.getByText('4. Review')).toBeVisible();
   await expect(page.getByRole('button', { name: /AI Chat/i })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('combobox', { name: 'AI chat service' })).toHaveValue('chatgpt');
+  await expect(page.getByRole('button', { name: 'Copy prompt & open ChatGPT' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Paste from clipboard & validate' })).toBeVisible();
   await page.getByRole('button', { name: /^API/i }).click();
   await expect(page.getByPlaceholder('Stored in memory only')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Feedback' })).toHaveAttribute('href', 'https://github.com/edwardsage419/FlowExtract/issues/new/choose');
