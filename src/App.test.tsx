@@ -57,10 +57,10 @@ describe('FlowExtract workspace', () => {
           amount: {
             key: 'amount',
             prediction: 1333.8,
-            correction: 1333.81,
             finalValue: 1333.81,
             status: 'corrected',
-            issues: [],
+            validationIssues: [],
+            correctedByHuman: true,
           },
         },
         globalIssues: [],
