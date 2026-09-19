@@ -1,6 +1,6 @@
 # Changelog / 更新记录
 
-## V0.1.1 — Unreleased
+## V0.1.1 — 2026-09-19
 
 English:
 
@@ -9,6 +9,8 @@ English:
 * Added manual JSON import with malformed output handling, unknown-field checks, and the existing deterministic field validation.
 * Added manual extraction provenance without storing the raw pasted chat response.
 * Kept the existing BYOK API flow and provider region controls unchanged.
+* Added an automated Playwright production smoke gate against the public workers.dev deployment.
+* Live production smoke verified AI Chat prompt generation, pasted JSON validation, human correction, Final Value JSON export, and API mode regression on 2026-09-19.
 
 中文：
 
@@ -17,6 +19,8 @@ English:
 * 增加手工 JSON 导入，并继续使用现有 Malformed Output、Unknown Fields 和字段 Validation。
 * 增加 Manual Extraction Provenance，原始粘贴 Chat Response 不写入持久化项目数据。
 * 保持现有 BYOK API 流程和 Provider Region 控制不变。
+* 增加针对公开 workers.dev 环境的自动化 Playwright Production Smoke Gate。
+* 2026-09-19 真实生产 Smoke 已验证 AI Chat Prompt 生成、粘贴 JSON Validation、Human Correction、Final Value JSON Export 和 API 模式回归。
 
 ## V0.1.0 — 2026-09-19
 
