@@ -5,8 +5,8 @@ test.skip(!process.env.PLAYWRIGHT_BASE_URL, 'Production smoke only runs against 
 test('production supports manual AI Chat extraction and preserves API mode', async ({ page }) => {
   test.setTimeout(180_000);
   const syntheticProject = {
-    id: 'production-smoke-v011',
-    name: 'Production smoke V0.1.1',
+    id: 'production-smoke-v012',
+    name: 'Production smoke V0.1.2',
     updatedAt: '2099-01-01T00:00:00.000Z',
     document: {
       id: 'production-smoke-document',
@@ -40,13 +40,13 @@ test('production supports manual AI Chat extraction and preserves API mode', asy
   let deployed = false;
   for (let attempt = 1; attempt <= 12; attempt += 1) {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    if (await page.getByText('v0.1.1').isVisible().catch(() => false)) {
+    if (await page.getByText('v0.1.2').isVisible().catch(() => false)) {
       deployed = true;
       break;
     }
     if (attempt < 12) await page.waitForTimeout(10_000);
   }
-  expect(deployed, 'workers.dev did not serve the V0.1.1 build before the smoke-test deadline').toBe(true);
+  expect(deployed, 'workers.dev did not serve the V0.1.2 build before the smoke-test deadline').toBe(true);
 
   await page.evaluate(async (project) => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -74,20 +74,25 @@ test('production supports manual AI Chat extraction and preserves API mode', asy
 
   await page.reload();
 
-  await expect(page.getByRole('textbox', { name: /Project/i })).toHaveValue('Production smoke V0.1.1');
+  await expect(page.getByRole('textbox', { name: /Project/i })).toHaveValue('Production smoke V0.1.2');
   await expect(page.getByRole('button', { name: /AI Chat/i })).toHaveAttribute('aria-pressed', 'true');
 
   const prompt = page.getByLabel('Generated extraction prompt');
   await expect(prompt).toHaveValue(/INV-2026-0919/);
   await expect(prompt).toHaveValue(/key=amount/);
 
-  await page.getByLabel('AI chat response').fill(JSON.stringify({
+  const origin = new URL(page.url()).origin;
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write'], { origin });
+  await page.evaluate(async (response) => {
+    await navigator.clipboard.writeText(response);
+  }, JSON.stringify({
     customer_name: 'Redwood Demo Company',
     invoice_number: 'INV-2026-0919',
     date: '2026-09-19',
     amount: 1333.8,
   }));
-  await page.getByRole('button', { name: 'Import & validate' }).click();
+  await page.getByRole('button', { name: 'Paste from clipboard & validate' }).click();
+  await expect(page.getByLabel('AI chat response')).toHaveValue(/1333.8/);
 
   const amountCard = page.locator('.review-card').filter({ hasText: 'Amount' });
   const amountInput = amountCard.getByLabel('Final value');
