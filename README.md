@@ -18,6 +18,15 @@ FlowExtract is an open source browser application for turning PDFs and document 
 
 `Document -> Extract -> Validate -> Review -> Export`
 
+### Extraction modes
+
+FlowExtract supports two extraction paths that converge on the same Validation, Review, Final Value, Export, and local eval flow:
+
+* **AI Chat**: generate a document-specific prompt locally, copy it into ChatGPT, Claude, Gemini, Qwen, or another AI chat, then paste the JSON response back into FlowExtract. No API key is required. FlowExtract does not automate or read the user's AI chat session.
+* **API**: keep the existing automated BYOK flow using OpenAI, Anthropic, Gemini, or Qwen. Provider usage may consume API quota or incur provider charges.
+
+Manual AI Chat imports preserve the AI prediction and record the selected chat service as provenance. The raw pasted chat response remains page-local while editing and is not added to the project record.
+
 The review step is the product focus. AI makes the first prediction. Deterministic rules identify missing, malformed, or out of range values. The user sees the source alongside the predicted and final values and corrects only what needs attention.
 
 ## V0.1 scope
@@ -39,7 +48,7 @@ Exports include JSON, CSV, and XLSX. Project state is stored in IndexedDB. Porta
 
 FlowExtract has no application backend in V0.1.
 
-Documents are parsed in the browser. OCR runs locally with Tesseract.js. AI extraction sends the parsed document text directly from the browser to the provider selected by the user. FlowExtract does not proxy those requests through a FlowExtract server.
+Documents are parsed in the browser. OCR runs locally with Tesseract.js. In AI Chat mode, FlowExtract generates the prompt locally and the user decides when and where to paste it. In API mode, parsed document text is sent directly from the browser to the provider selected by the user. FlowExtract does not proxy either path through a FlowExtract server.
 
 API keys are held only in React memory for the current page session. They are not written to IndexedDB, project backups, source code, or logs. Reloading the page clears the key.
 
