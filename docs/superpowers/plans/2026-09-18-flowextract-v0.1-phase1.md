@@ -1,5 +1,7 @@
 # FlowExtract V0.1 Phase 1 Implementation Plan
 
+> Historical implementation plan. Final V0.1 deployment and provider verification status are recorded in the current design spec, `docs/release-v0.1.md`, and `docs/deployment-cloudflare-workers.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Deliver a browser-only end-to-end MVP path from document ingestion through schema definition, BYOK AI extraction, deterministic validation, human review, local persistence, and JSON/CSV/XLSX export.
@@ -76,7 +78,7 @@
 
 **Files:**
 * Create `src/features/providers/types.ts`.
-* Create provider helpers and adapters for OpenAI, Anthropic, and Gemini.
+* Create provider helpers and adapters for OpenAI, Anthropic, Gemini, and Qwen.
 * Test response parsing and normalized errors.
 
 **Interfaces:**
@@ -157,7 +159,7 @@
 
 **Files:**
 * Create `README.md`, `README.zh-CN.md`, `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`.
-* Create Cloudflare Pages guidance and GitHub Actions CI.
+* Create Cloudflare Workers + Static Assets guidance and GitHub Actions CI.
 * Add `playwright.config.ts` and browser smoke test.
 
 **Interfaces:**
