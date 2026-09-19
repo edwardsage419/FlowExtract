@@ -15,7 +15,6 @@ interface ExtractionPanelProps {
 }
 
 export function ExtractionPanel(props: ExtractionPanelProps) {
-  const metadata = PROVIDER_METADATA[props.provider];
   const verification = getProviderVerification(props.provider, props.provider === 'qwen' ? props.qwenRegion : undefined);
   const region = props.provider === 'qwen' ? QWEN_REGIONS[props.qwenRegion] : null;
   return (
