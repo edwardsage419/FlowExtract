@@ -1,6 +1,6 @@
 # Manual AI Chat Extraction Mode
 
-Status: V0.1.1 production smoke verified. V0.1.2 Assisted AI Chat improvements are in development.
+Status: V0.1.2 Assisted AI Chat production smoke verified on 2026-09-19.
 
 ## Goal
 
