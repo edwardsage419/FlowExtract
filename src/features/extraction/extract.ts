@@ -36,6 +36,7 @@ export async function runExtraction(input: RunExtractionInput): Promise<Extracti
     id: crypto.randomUUID(),
     documentId: input.document.id,
     schemaId: input.schema.id,
+    extractionMode: 'api',
     provider: input.provider.id,
     model: input.model,
     providerRegion: input.providerRegion,

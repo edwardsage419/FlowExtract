@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import * as projectStore from './features/persistence/projectStore';
@@ -22,11 +22,57 @@ describe('FlowExtract workspace', () => {
     expect(screen.getByText(/2\. Schema/i)).toBeInTheDocument();
     expect(screen.getByText(/3\. AI Extraction/i)).toBeInTheDocument();
     expect(screen.getByText(/4\. Review/i)).toBeInTheDocument();
-    expect(screen.getByText('v0.1.0')).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /Qwen \(Alibaba Cloud\) — Verified in Beijing/i })).toBeInTheDocument();
+    expect(screen.getByText('v0.1.1')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /AI Chat/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('option', { name: 'ChatGPT' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^API/i }));
+    expect(screen.getByRole('option', { name: /Qwen \(Alibaba Cloud\) - Verified in Beijing/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Stored in memory only')).toHaveValue('');
     expect(screen.getByRole('link', { name: 'Feedback' })).toHaveAttribute('href', 'https://github.com/edwardsage419/FlowExtract/issues/new/choose');
   });
 
+
+
+  it('imports pasted AI chat JSON into the existing validation and review flow', async () => {
+    const source: ProjectRecord = {
+      id: 'manual-source',
+      name: 'Manual chat invoice',
+      updatedAt: '2026-09-19T00:00:00.000Z',
+      document: {
+        id: 'doc-manual',
+        name: 'invoice.pdf',
+        mimeType: 'application/pdf',
+        size: 100,
+        createdAt: '2026-09-19T00:00:00.000Z',
+        text: 'Invoice INV-42 total 1333.80',
+        pages: ['Invoice INV-42 total 1333.80'],
+        sourceKind: 'pdf',
+        ocrUsed: false,
+      },
+      schema: {
+        id: 'schema-manual',
+        name: 'Invoice',
+        updatedAt: '2026-09-19T00:00:00.000Z',
+        fields: [{ id: 'amount-field', name: 'Amount', key: 'amount', type: 'number', required: true, description: '', rules: {} }],
+      },
+    };
+    vi.spyOn(projectStore, 'listProjects').mockResolvedValue([source]);
+    vi.spyOn(projectStore, 'saveProject').mockResolvedValue();
+    render(<App />);
+
+    await waitFor(() => expect(screen.getByRole('textbox', { name: /Project/i })).toHaveValue('Manual chat invoice'));
+    expect(screen.getByRole('button', { name: /AI Chat/i })).toHaveAttribute('aria-pressed', 'true');
+
+    const fence = String.fromCharCode(96).repeat(3);
+    fireEvent.change(screen.getByLabelText('AI chat response'), {
+      target: { value: fence + 'json\n{"amount":1333.8}\n' + fence },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Import & validate' }));
+
+    await waitFor(() => expect(screen.getByDisplayValue('1333.8')).toBeInTheDocument());
+    expect(screen.getByText('1333.8')).toBeInTheDocument();
+    expect(screen.getByText(/0 issues/i)).toBeInTheDocument();
+  });
 
   it('does not autosave a blank project before startup hydration completes', async () => {
     vi.useFakeTimers();
@@ -95,6 +141,7 @@ describe('FlowExtract workspace', () => {
     expect(screen.getByDisplayValue('1333.81')).toBeInTheDocument();
     expect(screen.getByText('1333.8')).toBeInTheDocument();
     expect(screen.getAllByText(/corrected/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /^API/i })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByPlaceholderText('Stored in memory only')).toHaveValue('');
   });
 });

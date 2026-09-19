@@ -4,7 +4,7 @@ Local First 的 AI 辅助文档数据提取、验证与人工复核工具。
 
 [English](README.md)
 
-## 试用 V0.1.0 与反馈
+## 试用 FlowExtract 与反馈
 
 在线版本：https://flowextract.edwardxie421.workers.dev
 
@@ -12,11 +12,20 @@ Local First 的 AI 辅助文档数据提取、验证与人工复核工具。
 
 请勿在公开 Issue 中提交 API Key、凭据、完整 Provider Response 或敏感文档正文。如需提供复现文件，请使用公开、虚构或已脱敏的示例。
 
-FlowExtract 是一个开源浏览器应用，用于把 PDF 和文档图片转换成可以人工复核的结构化数据。V0.1 刻意控制范围：上传文档，定义 Schema，使用自己的 AI Provider API Key 完成初始提取，在本地执行确定性验证，只修正可疑字段，然后导出 JSON、CSV 或 XLSX。
+FlowExtract 是一个开源浏览器应用，用于把 PDF 和文档图片转换成可以人工复核的结构化数据。当前 V0.1.x 继续控制范围：上传文档，定义 Schema，通过 AI Chat 或自己的 AI Provider API Key 完成初始提取，在本地执行确定性验证，只修正可疑字段，然后导出 JSON、CSV 或 XLSX。
 
 ## V0.1 工作流
 
 `Document -> Extract -> Validate -> Review -> Export`
+
+### Extraction 模式
+
+FlowExtract 提供两种提取方式，两条路径最终都进入同一套 Validation、Review、Final Value、Export 和本地 Evals：
+
+* **AI Chat**：在本地生成包含当前文档和 Schema 的 Prompt，由用户自行复制到 ChatGPT、Claude、Gemini、Qwen 或其他 AI Chat，再把 JSON 结果粘贴回 FlowExtract。无需 API Key。FlowExtract 不会自动操作或读取用户的 AI Chat 会话。
+* **API**：保留现有自动化 BYOK 流程，支持 OpenAI、Anthropic、Gemini、Qwen。Provider 可能消耗 API 配额或产生费用。
+
+Manual AI Chat 导入后仍会保留 AI Prediction，并把用户选择的 Chat Service 记录为 Provenance。用户粘贴的原始 Chat Response 只在当前页面编辑状态中存在，不写入 Project Record。
 
 Review 是产品重点。AI 先给出预测，确定性 Validation Rules 检查缺失值、格式错误和范围异常，用户同时查看来源文本、AI prediction 和 final value，只处理需要人工介入的字段。
 
@@ -39,7 +48,7 @@ BYOK Provider 已建立 OpenAI、Anthropic、Gemini、Qwen（阿里云百炼 / M
 
 V0.1 没有 FlowExtract 应用后端。
 
-文档在浏览器本地解析。OCR 使用 Tesseract.js 在本地执行。需要 AI 提取时，浏览器直接把解析后的文档文本发送给用户选择的 AI Provider，不经过 FlowExtract 自己的服务器。
+文档在浏览器本地解析。OCR 使用 Tesseract.js 在本地执行。AI Chat 模式在本地生成 Prompt，由用户自行决定何时、向哪个 AI Chat 粘贴。API 模式由浏览器把解析后的文档文本直接发送给用户选择的 AI Provider。两种方式都不经过 FlowExtract 自己的服务器。
 
 API Key 只保存在当前页面的 React 内存状态中，不写入 IndexedDB、项目备份、源代码或日志。刷新页面后 Key 会消失。
 

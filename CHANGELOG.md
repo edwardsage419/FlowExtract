@@ -1,5 +1,23 @@
 # Changelog / 更新记录
 
+## V0.1.1 — Unreleased
+
+English:
+
+* Added selectable AI Chat and API extraction modes.
+* Added local prompt generation for manual ChatGPT, Claude, Gemini, Qwen, and other AI chat workflows.
+* Added manual JSON import with malformed output handling, unknown-field checks, and the existing deterministic field validation.
+* Added manual extraction provenance without storing the raw pasted chat response.
+* Kept the existing BYOK API flow and provider region controls unchanged.
+
+中文：
+
+* 增加可选择的 AI Chat 与 API 两种 Extraction 模式。
+* 增加适用于 ChatGPT、Claude、Gemini、Qwen 和其他 AI Chat 的本地 Prompt 生成。
+* 增加手工 JSON 导入，并继续使用现有 Malformed Output、Unknown Fields 和字段 Validation。
+* 增加 Manual Extraction Provenance，原始粘贴 Chat Response 不写入持久化项目数据。
+* 保持现有 BYOK API 流程和 Provider Region 控制不变。
+
 ## V0.1.0 — 2026-09-19
 
 English:

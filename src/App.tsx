@@ -7,6 +7,8 @@ import { parseDocument } from './features/documents/parseDocument';
 import { computeMetrics } from './features/evals/metrics';
 import { toCsv, toJson, toXlsx } from './features/export/exporters';
 import { runExtraction } from './features/extraction/extract';
+import { buildManualExtractionPrompt, importManualExtraction } from './features/extraction/manual';
+import type { ExtractionMode, ManualAIService } from './features/extraction/types';
 import { exportProjectBackup, importProjectBackup } from './features/persistence/backup';
 import { listProjects, loadProject, saveProject } from './features/persistence/projectStore';
 import type { ProjectRecord } from './features/project/types';
@@ -39,6 +41,9 @@ function downloadText(filename: string, text: string, mime: string) { downloadBl
 
 export default function App() {
   const [project, setProject] = useState<ProjectRecord>(() => newProject());
+  const [extractionMode, setExtractionMode] = useState<ExtractionMode>('manual');
+  const [manualService, setManualService] = useState<ManualAIService>('chatgpt');
+  const [manualResponse, setManualResponse] = useState('');
   const [provider, setProvider] = useState<ProviderId>('openai');
   const [model, setModel] = useState(DEFAULT_MODELS.openai);
   const [apiKey, setApiKey] = useState('');
@@ -53,6 +58,36 @@ export default function App() {
   const restoreRef = useRef<HTMLInputElement>(null);
 
   const metrics = useMemo(() => project.extraction ? computeMetrics(project.extraction.fields) : null, [project.extraction]);
+  const manualPrompt = useMemo(() => {
+    if (!project.document) return '';
+    try {
+      return buildManualExtractionPrompt(project.document, project.schema);
+    } catch {
+      return '';
+    }
+  }, [project.document, project.schema]);
+
+  function restoreExtractionUi(source?: ProjectRecord) {
+    const extraction = source?.extraction;
+    setApiKey('');
+    setManualResponse('');
+    if (!extraction) {
+      setExtractionMode('manual');
+      setManualService('chatgpt');
+      return;
+    }
+    if (extraction.extractionMode === 'manual') {
+      setExtractionMode('manual');
+      setManualService(extraction.manualService ?? 'other');
+      return;
+    }
+    setExtractionMode('api');
+    if (extraction.provider) {
+      setProvider(extraction.provider);
+      setModel(extraction.model || DEFAULT_MODELS[extraction.provider]);
+      if (extraction.provider === 'qwen' && extraction.providerRegion) setQwenRegion(extraction.providerRegion);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -64,7 +99,7 @@ export default function App() {
         if (latest) {
           setProject(latest);
           setPreviewUrl(null);
-          setApiKey('');
+          restoreExtractionUi(latest);
         }
         setHydrated(true);
       })
@@ -84,6 +119,7 @@ export default function App() {
 
   const touch = (next: ProjectRecord): ProjectRecord => ({ ...next, updatedAt: now() });
   const updateSchema = (updater: (schema: ProjectRecord['schema']) => ProjectRecord['schema']) => {
+    setManualResponse('');
     setProject((current) => touch({ ...current, schema: { ...updater(current.schema), updatedAt: now() }, extraction: undefined }));
   };
 
@@ -94,6 +130,7 @@ export default function App() {
       setPreviewUrl(URL.createObjectURL(file));
       const documentRecord = await parseDocument(file, { ocrLanguage, onProgress: setProgress });
       setProject((current) => touch({ ...current, document: documentRecord, extraction: undefined }));
+      setManualResponse('');
       setProgress(documentRecord.ocrUsed ? 'Local OCR complete.' : 'PDF text extraction complete.');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to read document.'); setProgress('');
@@ -108,6 +145,22 @@ export default function App() {
       setProject((current) => touch({ ...current, extraction }));
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Extraction failed.'); }
     finally { setBusy(null); }
+  }
+
+  function handleManualImport() {
+    if (!project.document) return;
+    setError('');
+    try {
+      const extraction = importManualExtraction({
+        document: project.document,
+        schema: project.schema,
+        service: manualService,
+        rawResponse: manualResponse,
+      });
+      setProject((current) => touch({ ...current, extraction }));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to import AI chat response.');
+    }
   }
 
   function correct(key: string, value: string) {
@@ -130,21 +183,33 @@ export default function App() {
 
   function exportBackup() { downloadText(`${project.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'flowextract'}-backup.json`, exportProjectBackup(project), 'application/json'); }
   async function restoreBackup(file: File) {
-    try { const restored = importProjectBackup(await file.text()); setProject(restored); setPreviewUrl(null); setApiKey(''); setError(''); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to restore backup.'); }
+    try {
+      const restored = importProjectBackup(await file.text());
+      setProject(restored);
+      setPreviewUrl(null);
+      restoreExtractionUi(restored);
+      setError('');
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to restore backup.'); }
   }
-  async function openRecent(id: string) { const stored = await loadProject(id); if (stored) { setProject(stored); setPreviewUrl(null); setApiKey(''); } }
+  async function openRecent(id: string) {
+    const stored = await loadProject(id);
+    if (stored) {
+      setProject(stored);
+      setPreviewUrl(null);
+      restoreExtractionUi(stored);
+    }
+  }
 
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div><div className="brand-row"><span className="brand-mark">FX</span><h1>FlowExtract</h1><span className="version">v0.1.0</span></div><p>Local first AI assisted document extraction, validation and human review.</p></div>
+        <div><div className="brand-row"><span className="brand-mark">FX</span><h1>FlowExtract</h1><span className="version">v0.1.1</span></div><p>Local first AI assisted document extraction, validation and human review.</p></div>
         <div className="top-actions">
           <select aria-label="Recent projects" value={project.id} onChange={(e) => openRecent(e.target.value)}>
             <option value={project.id}>{project.name}</option>
             {recent.filter((item) => item.id !== project.id).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select>
-          <button className="button ghost" onClick={() => { setProject(newProject()); setPreviewUrl(null); setApiKey(''); }}>New</button>
+          <button className="button ghost" onClick={() => { setProject(newProject()); setPreviewUrl(null); restoreExtractionUi(); }}>New</button>
           <button className="button ghost" onClick={exportBackup}>Backup</button>
           <button className="button ghost" onClick={() => restoreRef.current?.click()}>Restore</button>
           <input ref={restoreRef} className="hidden" type="file" accept="application/json,.json" onChange={(e) => { const file = e.target.files?.[0]; if (file) void restoreBackup(file); e.target.value = ''; }} />
@@ -163,14 +228,35 @@ export default function App() {
         </div>
         <div className="workspace-column middle-column">
           <SchemaBuilder schema={project.schema} onNameChange={(name) => updateSchema((schema) => ({ ...schema, name }))} onAddField={() => updateSchema((schema) => ({ ...schema, fields: [...schema.fields, field('New Field', `field_${schema.fields.length + 1}`, 'string')] }))} onRemoveField={(id) => updateSchema((schema) => ({ ...schema, fields: schema.fields.filter((item) => item.id !== id) }))} onFieldChange={(id, patch) => updateSchema((schema) => ({ ...schema, fields: schema.fields.map((item) => item.id === id ? { ...item, ...patch } : item) }))} />
-          <ExtractionPanel provider={provider} model={model} apiKey={apiKey} qwenRegion={qwenRegion} busy={busy === 'extract'} disabled={!project.document || !apiKey.trim() || project.schema.fields.length === 0} onProviderChange={(next) => { setProvider(next); setModel(DEFAULT_MODELS[next]); }} onModelChange={setModel} onApiKeyChange={setApiKey} onQwenRegionChange={setQwenRegion} onExtract={handleExtract} />
+          <ExtractionPanel
+            mode={extractionMode}
+            manualService={manualService}
+            manualPrompt={manualPrompt}
+            manualResponse={manualResponse}
+            manualDisabled={!project.document || !manualPrompt || project.schema.fields.length === 0}
+            provider={provider}
+            model={model}
+            apiKey={apiKey}
+            qwenRegion={qwenRegion}
+            busy={busy === 'extract'}
+            apiDisabled={!project.document || !apiKey.trim() || project.schema.fields.length === 0}
+            onModeChange={setExtractionMode}
+            onManualServiceChange={setManualService}
+            onManualResponseChange={setManualResponse}
+            onManualImport={handleManualImport}
+            onProviderChange={(next) => { setProvider(next); setModel(DEFAULT_MODELS[next]); }}
+            onModelChange={setModel}
+            onApiKeyChange={setApiKey}
+            onQwenRegionChange={setQwenRegion}
+            onExtract={handleExtract}
+          />
         </div>
         <div className="workspace-column right-column">
           <ReviewPanel extraction={project.extraction} schema={project.schema} metrics={metrics} onCorrect={correct} onExport={exportData} />
         </div>
       </div>
       <footer>
-        <span>Documents stay in this browser. AI extraction sends document text directly to the provider you choose with your own API key.</span>
+        <span>Documents are parsed locally. AI Chat mode lets you copy the prompt yourself; API mode sends document text directly to the provider you choose with your own key.</span>
         <a href="https://github.com/edwardsage419/FlowExtract/issues/new/choose" target="_blank" rel="noreferrer">Feedback</a>
       </footer>
     </main>
