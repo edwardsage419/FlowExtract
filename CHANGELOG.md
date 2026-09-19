@@ -1,6 +1,6 @@
 # Changelog / 更新记录
 
-## V0.1.2 — Unreleased
+## V0.1.2 — 2026-09-19
 
 English:
 
@@ -9,6 +9,8 @@ English:
 * Kept manual response paste as a fallback when clipboard permissions are unavailable or blocked.
 * Clipboard access occurs only after an explicit user action. FlowExtract does not monitor clipboard content in the background.
 * Added no AI-page DOM automation, cookie or session access, scraping, backend service, or new dependency.
+* Added production smoke coverage for user-triggered clipboard import on the live `workers.dev` deployment.
+* Production smoke Run #59 passed on commit `4ec7d015402349847b137751c92c748d83c54b38`.
 
 中文：
 
@@ -17,6 +19,8 @@ English:
 * Clipboard 权限不可用或被阻止时，继续保留手工粘贴 Response 的兜底路径。
 * Clipboard 只在用户明确点击时读取或写入，FlowExtract 不会在后台监听剪贴板。
 * 不增加 AI 页面 DOM 自动化、Cookie 或 Session 读取、网页抓取、Backend 或新依赖。
+* 增加真实 `workers.dev` 部署上的用户主动 Clipboard Import Production Smoke 覆盖。
+* Production Smoke Run #59 已在提交 `4ec7d015402349847b137751c92c748d83c54b38` 上通过。
 
 ## V0.1.1 — 2026-09-19
 
