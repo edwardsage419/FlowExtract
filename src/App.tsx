@@ -49,20 +49,36 @@ export default function App() {
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
   const [recent, setRecent] = useState<ProjectRecord[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const restoreRef = useRef<HTMLInputElement>(null);
 
   const metrics = useMemo(() => project.extraction ? computeMetrics(project.extraction.fields) : null, [project.extraction]);
 
   useEffect(() => {
-    listProjects().then(setRecent).catch(() => undefined);
+    let cancelled = false;
+    listProjects()
+      .then((projects) => {
+        if (cancelled) return;
+        setRecent(projects);
+        const latest = projects[0];
+        if (latest) {
+          setProject(latest);
+          setPreviewUrl(null);
+          setApiKey('');
+        }
+        setHydrated(true);
+      })
+      .catch(() => { if (!cancelled) setHydrated(true); });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     const timer = window.setTimeout(() => {
       saveProject(project).then(() => listProjects().then(setRecent)).catch(() => undefined);
     }, 350);
     return () => window.clearTimeout(timer);
-  }, [project]);
+  }, [project, hydrated]);
 
   useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
 
