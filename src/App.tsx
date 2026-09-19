@@ -54,7 +54,20 @@ export default function App() {
   const metrics = useMemo(() => project.extraction ? computeMetrics(project.extraction.fields) : null, [project.extraction]);
 
   useEffect(() => {
-    listProjects().then(setRecent).catch(() => undefined);
+    let cancelled = false;
+    listProjects()
+      .then((projects) => {
+        if (cancelled) return;
+        setRecent(projects);
+        const latest = projects[0];
+        if (latest) {
+          setProject(latest);
+          setPreviewUrl(null);
+          setApiKey('');
+        }
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
