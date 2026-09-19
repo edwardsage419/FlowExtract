@@ -2,6 +2,8 @@
 
 Date: 2026-09-19
 
+Publication status: production-verified during development but not published as a separate Git tag or GitHub Release. Superseded by V0.1.2.
+
 Target commit before release-finalization docs: `f262f255ea7b38141197d6c7263f381678e112c5`
 
 Production URL:
@@ -79,12 +81,6 @@ OpenAI, Anthropic, Gemini, Qwen Singapore, and Qwen Hong Kong remain Experimenta
 
 ## Release publication
 
-The code and production gate are ready for public V0.1.1 publication after this documentation change is merged and CI is green.
+V0.1.1 was intentionally not published as a separate Git tag or GitHub Release. Its AI Chat / API dual-mode work was carried forward into V0.1.2, which is the next public release.
 
-Public publication requires:
-
-1. Git tag `v0.1.1` on the final verified main commit.
-2. GitHub Release titled `FlowExtract V0.1.1`.
-3. Release notes based on the V0.1.1 section of `CHANGELOG.md`.
-4. The production URL above.
-5. No credentials, private documents, or user data attached.
+See `docs/release-v0.1.2.md` and tag `v0.1.2`.

@@ -63,14 +63,21 @@ After a successful production deployment, verify the `workers.dev` site:
 1. FlowExtract renders the Document, Schema, AI Extraction, Review, and Export workflow.
 2. A public or synthetic PDF can be parsed locally.
 3. Schema fields can be created and edited.
-4. API keys are empty after a page reload.
-5. Parsed document text, schema, extraction, validation, and human corrections restore from IndexedDB.
-6. The original uploaded binary is not restored from IndexedDB.
-7. JSON, CSV, and XLSX exports use Final Value.
-8. Backup and Restore preserve project data and corrections but exclude credentials and the original binary document.
-9. Browser developer tools show no FlowExtract application backend receiving document text or provider credentials.
+4. AI Chat mode generates the expected local prompt.
+5. Assisted AI Chat can import a copied response through **Paste from clipboard & validate** when browser permission is granted.
+6. Manual response paste remains usable when clipboard permission is unavailable or blocked.
+7. API mode remains available and API keys are empty after a page reload.
+8. Parsed document text, schema, extraction, validation, and human corrections restore from IndexedDB.
+9. The original uploaded binary is not restored from IndexedDB.
+10. JSON, CSV, and XLSX exports use Final Value.
+11. Backup and Restore preserve project data and corrections but exclude credentials and the original binary document.
+12. Browser developer tools show no FlowExtract application backend receiving document text or provider credentials.
 
-The V0.1 production smoke test used a fictional invoice fixture and Qwen in China (Beijing). It verified extraction, validation, correction, revalidation, export, IndexedDB reload, and backup/restore without sharing the API key.
+Release history:
+
+* V0.1.0 used a fictional invoice with Qwen China (Beijing) for the real BYOK extraction smoke.
+* V0.1.2 added automated live-production coverage for Assisted AI Chat clipboard import, deterministic validation, human correction, Final Value JSON export, and API-mode regression.
+* Final V0.1.2 main CI Run #61 passed against `https://flowextract.edwardxie421.workers.dev` on commit `505cd30d227dc9919ef71b5451836f1b5ab1a319`.
 
 ## Rollback
 

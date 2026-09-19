@@ -2,9 +2,9 @@
 
 ## Reporting / 报告方式
 
-Do not open a public issue containing API keys, private documents, credentials, or exploitable sensitive details. For the first public release, use GitHub's private security advisory feature when available.
+Do not open a public issue containing API keys, private documents, credentials, or exploitable sensitive details. Report security vulnerabilities through GitHub Private Security Advisories when available.
 
-不要在公开 Issue 中提交 API Key、私人文档、凭据或可直接利用的敏感细节。公开发布后优先使用 GitHub Private Security Advisory。
+不要在公开 Issue 中提交 API Key、私人文档、凭据或可直接利用的敏感细节。安全漏洞优先通过 GitHub Private Security Advisory 私下报告。
 
 ## V0.1 trust boundary / V0.1 信任边界
 

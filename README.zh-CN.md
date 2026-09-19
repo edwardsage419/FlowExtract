@@ -8,6 +8,8 @@ Local First 的 AI 辅助文档数据提取、验证与人工复核工具。
 
 在线版本：https://flowextract.edwardxie421.workers.dev
 
+最新 Release：[FlowExtract V0.1.2](https://github.com/edwardsage419/FlowExtract/releases/tag/v0.1.2)
+
 如果你正在使用真实文档测试 FlowExtract，请通过 [GitHub Issues](https://github.com/edwardsage419/FlowExtract/issues/new/choose) 提交 Bug 或真实使用反馈。
 
 请勿在公开 Issue 中提交 API Key、凭据、完整 Provider Response 或敏感文档正文。如需提供复现文件，请使用公开、虚构或已脱敏的示例。
@@ -129,6 +131,7 @@ Provider API 会变化，每次 Release 前都需要重新核对官方文档。�
 * 大型 PDF 在浏览器内存中处理，低内存设备可能较慢。
 * 原始二进制文档不持久化到 IndexedDB。刷新后解析文本仍可恢复，原文件预览需要重新选择文件。
 * BYOK 浏览器直连依赖各 Provider 持续允许浏览器请求，同时取决于用户自己的 Provider 账户配置。
+* Assisted AI Chat 的 Clipboard 访问依赖浏览器权限和用户主动操作。Clipboard 被阻止时仍可使用手工粘贴 Response 的兜底路径。
 
 ## 许可证
 
@@ -138,4 +141,6 @@ MIT
 ## 部署与发布文档
 
 * `docs/deployment-cloudflare-workers.md`
+* `docs/manual-ai-chat-mode.md`
+* `docs/release-v0.1.2.md`
 * `docs/release-v0.1.md`

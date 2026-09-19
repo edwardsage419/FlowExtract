@@ -8,6 +8,8 @@ Local first AI assisted document extraction, validation and human review.
 
 Live app: https://flowextract.edwardxie421.workers.dev
 
+Latest release: [FlowExtract V0.1.2](https://github.com/edwardsage419/FlowExtract/releases/tag/v0.1.2)
+
 Testing FlowExtract with a real document? Please report bugs and real-world test feedback through [GitHub Issues](https://github.com/edwardsage419/FlowExtract/issues/new/choose).
 
 Do not include API keys, credentials, full provider responses, or sensitive document content in public issues. If a reproduction file is useful, use a public, synthetic, or sanitized example.
@@ -129,6 +131,7 @@ Provider APIs can change. Recheck current provider documentation before each rel
 * Large PDFs are processed in browser memory and may be slow on low memory devices.
 * Binary documents are not persisted in IndexedDB. After a reload, parsed text remains available while the embedded binary preview needs the file to be selected again.
 * Direct BYOK depends on each provider continuing to permit browser requests and on the user's account configuration.
+* Assisted AI Chat clipboard access depends on browser permissions and a user gesture. Manual response paste remains available when clipboard access is blocked.
 
 ## Repository documents
 
@@ -138,6 +141,8 @@ Provider APIs can change. Recheck current provider documentation before each rel
 * `SECURITY.md`
 * `CHANGELOG.md`
 * `docs/deployment-cloudflare-workers.md`
+* `docs/manual-ai-chat-mode.md`
+* `docs/release-v0.1.2.md`
 * `docs/release-v0.1.md`
 
 ## License

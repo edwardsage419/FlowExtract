@@ -33,6 +33,7 @@ body:
         - Document parsing
         - OCR
         - Schema
+        - AI Chat assistance or clipboard
         - Provider request
         - Structured output
         - Validation
@@ -69,16 +70,32 @@ body:
       placeholder: "Example: English"
 
   - type: dropdown
-    id: provider
+    id: extraction-mode
     attributes:
-      label: AI provider
+      label: Extraction mode
       options:
+        - AI Chat
+        - API
+        - Not applicable
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ai-service
+    attributes:
+      label: AI chat service or API provider
+      options:
+        - ChatGPT
+        - Claude
+        - Gemini Chat
+        - Qwen Chat
+        - OpenAI API
+        - Anthropic API
+        - Gemini API
         - Qwen China (Beijing)
         - Qwen Singapore
         - Qwen Hong Kong
-        - OpenAI
-        - Anthropic
-        - Gemini
+        - Other
         - Not applicable
     validations:
       required: true
@@ -86,8 +103,8 @@ body:
   - type: input
     id: model
     attributes:
-      label: Model
-      description: Model ID only. Do not include credentials.
+      label: Model, if known
+      description: Model ID or displayed model name only. Do not include credentials. Leave blank if the AI chat product does not expose the model.
 
   - type: input
     id: browser
