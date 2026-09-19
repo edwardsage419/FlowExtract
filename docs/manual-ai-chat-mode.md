@@ -1,6 +1,6 @@
 # Manual AI Chat Extraction Mode
 
-Status: V0.1.1 release candidate.
+Status: Released in V0.1.1 on 2026-09-19.
 
 ## Goal
 
