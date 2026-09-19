@@ -23,7 +23,7 @@ describe('FlowExtract workspace', () => {
     expect(screen.getByText(/3\. AI Extraction/i)).toBeInTheDocument();
     expect(screen.getByText(/4\. Review/i)).toBeInTheDocument();
     expect(screen.getByText('v0.1.0')).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /Qwen \(Alibaba Cloud\) — Verified/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /Qwen \(Alibaba Cloud\) — Verified in Beijing/i })).toBeInTheDocument();
   });
 
 
