@@ -49,6 +49,7 @@ export default function App() {
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
   const [recent, setRecent] = useState<ProjectRecord[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const restoreRef = useRef<HTMLInputElement>(null);
 
   const metrics = useMemo(() => project.extraction ? computeMetrics(project.extraction.fields) : null, [project.extraction]);
@@ -65,17 +66,19 @@ export default function App() {
           setPreviewUrl(null);
           setApiKey('');
         }
+        setHydrated(true);
       })
-      .catch(() => undefined);
+      .catch(() => { if (!cancelled) setHydrated(true); });
     return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     const timer = window.setTimeout(() => {
       saveProject(project).then(() => listProjects().then(setRecent)).catch(() => undefined);
     }, 350);
     return () => window.clearTimeout(timer);
-  }, [project]);
+  }, [project, hydrated]);
 
   useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
 
